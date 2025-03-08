@@ -6,21 +6,21 @@ import java.awt.image.BufferedImage;
 
 import inputs.MouseInput;
 import utilz.LoadImage;
-import utilz.LoadImage.*;
 
 public class GamePanel extends JPanel {
     private  Game game;
     private BufferedImage img;
     private MouseInput mouseInput;
+    private Board board;
 
 
-    public static final  int WIDTH = 800;
-    public static final  int HEIGHT = 800;
-    GamePanel( Game game){
+
+    GamePanel( Game game , Board board  ) {
         this.game = game;
-        setPreferredSize(new Dimension(WIDTH,HEIGHT));
-        img = LoadImage.GetBackground(LoadImage.Board_background);
-        mouseInput = new MouseInput();
+        setPreferredSize(new Dimension(Game.GAME_WIDTH, Game.GAME_HEIGHT));
+        img = LoadImage.GetAtlas(LoadImage.boardBackground);
+        this.board = board;
+        mouseInput = new MouseInput(this.board);
 
         addMouseListener(mouseInput);
         addMouseMotionListener(mouseInput);
@@ -40,8 +40,8 @@ public class GamePanel extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.drawImage(img,0,0,WIDTH, HEIGHT,this);
-
+        g.drawImage(img,0,0,Game.GAME_WIDTH, Game.GAME_HEIGHT,this);
+        game.render(g);
     }
 
 }
