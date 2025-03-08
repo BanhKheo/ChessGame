@@ -1,27 +1,29 @@
 package inputs;
 
+import main.Board;
+
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
 public class MouseInput implements MouseListener , MouseMotionListener {
-    public MouseInput(){
-
+    private Board board;
+    public MouseInput( Board board){
+        this.board = board;
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        System.out.println("Mouse Clicked");
+        board.handleSelectedPiece(e.getX() , e.getY());
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-        System.out.println("Mouse Pressed");
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        System.out.println("Mouse Released");
+
     }
 
     @Override
@@ -41,6 +43,6 @@ public class MouseInput implements MouseListener , MouseMotionListener {
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        System.out.println("Mouse Moved at: " + e.getX() + ", " + e.getY());
+
     }
 }

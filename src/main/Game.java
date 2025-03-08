@@ -7,6 +7,12 @@ public class Game implements Runnable {
     private GamePanel panel;
     private Board board;
 
+    //Global variable
+    public static final int GAME_WIDTH = 800;
+    public static final int GAME_HEIGHT = 800;
+
+    public static final int GAME_TILES = 100;
+
 
     //Game loop variable
     private Thread gameThread;
@@ -14,10 +20,10 @@ public class Game implements Runnable {
     private final int UPS_SET = 200;
 
     Game(){
-        panel = new GamePanel(this);
-        window = new GameWindow(panel);
-
         initialClasses();
+        panel = new GamePanel(this , board);
+        window = new GameWindow(panel);
+        startGameLoop();
 
 
     }
@@ -38,7 +44,7 @@ public class Game implements Runnable {
 
     public void render(Graphics g)
     {
-
+        board.draw(g);
     }
     @Override
     public void run() {
