@@ -14,11 +14,11 @@ public class MouseInput implements MouseListener , MouseMotionListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        board.handleSelectedPiece(e.getX() , e.getY());
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
+        board.handleSelectedPiece(e.getX() , e.getY());
     }
 
     @Override

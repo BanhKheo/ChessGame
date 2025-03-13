@@ -2,15 +2,17 @@ package chessPieces;
 
 import utilz.LoadImage;
 
-import java.awt.*;
+public class Queen extends Piece {
+    public Queen( int x , int y ,  boolean isWhite){
+        super(x, y , LoadImage.GetPieceImage(isWhite , "q") , isWhite);
 
-public class Queen extends Pieces {
-    public Queen( int x , int y){
-        super(x, y , LoadImage.GetAtlas(LoadImage.wq));
     }
 
     @Override
-    public void update() {
-
+    public  boolean logicMove( int oldRow , int oldCol , int newRow , int newCol){
+        return Math.abs(oldCol - newCol) == Math.abs(oldRow - newRow)
+                || oldRow == newRow
+                || oldCol == newCol ;
     }
+
 }
