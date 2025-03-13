@@ -8,10 +8,10 @@ public class Game implements Runnable {
     private Board board;
 
     //Global variable
-    public static final int GAME_WIDTH = 800;
-    public static final int GAME_HEIGHT = 800;
+    public static final int GAME_WIDTH = 720;
+    public static final int GAME_HEIGHT = 720;
 
-    public static final int GAME_TILES = 100;
+    public static final int GAME_TILES = 90;
 
 
     //Game loop variable

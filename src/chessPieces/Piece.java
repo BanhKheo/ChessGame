@@ -5,18 +5,20 @@ import main.Game;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-public abstract class Pieces {
+public abstract class Piece {
     protected int col;
     protected int row;
     protected int height;
     protected int width;
     protected BufferedImage img;
-    public Pieces(int col, int row, BufferedImage img){
+    protected boolean isWhite;
+    public Piece(int col, int row, BufferedImage img , boolean isWhite){
         this.col = col;
         this.row = row;
-        height = 100;
-        width = 100;
+        height = 90;
+        width = 90;
         this.img = img;
+        this.isWhite = isWhite;
     }
 
     public void draw(Graphics g){
@@ -24,7 +26,7 @@ public abstract class Pieces {
     }
 
 
-    public abstract void update();
+    public abstract boolean logicMove( int oldRow , int oldCol , int newRow , int newCol);
 
     public int getCol() {
         return col;
