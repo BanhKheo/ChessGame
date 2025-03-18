@@ -1,5 +1,6 @@
 package chessPieces;
 
+import main.Board;
 import utilz.LoadImage;
 
 public class Pawn extends Piece {
@@ -10,7 +11,7 @@ public class Pawn extends Piece {
     }
 
     @Override
-    public  boolean logicMove( int oldRow , int oldCol , int newRow , int newCol){
+    public  boolean logicMove( int oldRow , int oldCol , int newRow , int newCol , Board board){
         if( oldCol == newCol){
             if(!isMove)
             {

@@ -31,6 +31,7 @@ public class Board {
     };
 
 
+
     Board(){
         img = GetAtlas(boardBackground);
         initializePieces();
@@ -38,10 +39,6 @@ public class Board {
 
 
 
-    public void update(){
-
-
-    }
 
     //Handle the selected pieces when on click
     public void handleSelectedPiece( int x , int y ){
@@ -78,30 +75,19 @@ public class Board {
 
         }
     }
-    private List<int[]> getValidMoves(Piece piece) {
-        List<int[]> moves = new ArrayList<>();
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                if (legalMove(piece, j, i)) {
-                    moves.add(new int[]{j, i});
-                }
-            }
-        }
-        return moves;
-    }
 
 
     private boolean legalMove( Piece piece , int col , int row ){
         for(int i = 0 ; i < 8 ; i++)
             for ( int j = 0 ; j < 8 ; j++){
-                if( board[row][col] == 0 && piece.logicMove(piece.getRow() , piece.getCol() , row , col))
+                if( board[row][col] == 0 && piece.logicMove(piece.getRow() , piece.getCol() , row , col , this))
                     return true;
             }
         return false;
     }
 
 
-    private Piece getPieceAt(int col, int row) {
+    public Piece getPieceAt(int col, int row) {
         for( Piece p : pieces)
             if( p.getCol() == col && p.getRow() == row )
                 return p;
@@ -115,7 +101,7 @@ public class Board {
             boolean isWhite = (i >= 6); // White pieces are on rows 6 and 7 (ranks 2 and 1)
             for (int j = 0; j < board[i].length; j++) {
                 switch (board[i][j]) {
-                    case ROOK -> pieces.add(new Rook(j, i, isWhite));
+                    case ROOK -> pieces.add( new Rook(j, i , isWhite));
                     case KNIGHT -> pieces.add(new Knight(j, i, isWhite));
                     case BISHOP -> pieces.add(new Bishop(j, i, isWhite));
                     case QUEEN -> pieces.add(new Queen(j, i, isWhite));
@@ -126,11 +112,28 @@ public class Board {
             }
         }
     }
+
+    private List<int[]> getValidMoves(Piece piece) {
+        List<int[]> moves = new ArrayList<>();
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (legalMove(piece, j, i)) {
+                    int[] block = piece.getBlockPieces(this, i, j);
+                    if (block == null || (block[0] == i && block[1] == j)) {
+                        moves.add(new int[]{j, i});  // Only add unblocked moves
+                    }
+                }
+            }
+        }
+        return moves;
+    }
+
     public void draw(Graphics g){
 
         for( Piece p : pieces)
             p.draw(g);
 
+        
         // Draw valid move indicators
         if (selectedPiece != null) {
             g.setColor(new Color(169, 169, 169, 150));

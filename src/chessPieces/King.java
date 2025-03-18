@@ -1,5 +1,6 @@
 package chessPieces;
 
+import main.Board;
 import utilz.LoadImage;
 
 public class King extends Piece {
@@ -9,8 +10,11 @@ public class King extends Piece {
     }
 
     @Override
-    public  boolean logicMove( int oldRow , int oldCol , int newRow , int newCol){
+    public  boolean logicMove( int oldRow , int oldCol , int newRow , int newCol , Board board){
         return newRow == oldRow - 1 || newRow == oldRow + 1
             || newCol == oldCol - 1 || newCol == oldCol + 1 ;
     }
+
+
+
 }
