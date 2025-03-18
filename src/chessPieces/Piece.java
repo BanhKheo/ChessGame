@@ -1,5 +1,6 @@
 package chessPieces;
 
+import main.Board;
 import main.Game;
 
 import java.awt.*;
@@ -26,7 +27,11 @@ public abstract class Piece {
     }
 
 
-    public abstract boolean logicMove( int oldRow , int oldCol , int newRow , int newCol);
+    public abstract boolean logicMove(int oldRow , int oldCol , int newRow , int newCol , Board board);
+
+    public int[] getBlockPieces(Board board, int newRow, int newCol){
+        return null;
+    }
 
     public int getCol() {
         return col;
@@ -43,4 +48,6 @@ public abstract class Piece {
     public void setRow(int row) {
         this.row = row;
     }
+
+
 }
