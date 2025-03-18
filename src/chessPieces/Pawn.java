@@ -11,7 +11,7 @@ public class Pawn extends Piece {
     }
 
     @Override
-    public  boolean logicMove( int oldRow , int oldCol , int newRow , int newCol , Board board){
+    public  boolean logicMove( int oldRow , int oldCol , int newRow , int newCol ){
         if( oldCol == newCol){
             if(!isMove)
             {

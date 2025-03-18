@@ -27,7 +27,7 @@ public abstract class Piece {
     }
 
 
-    public abstract boolean logicMove(int oldRow , int oldCol , int newRow , int newCol , Board board);
+    public abstract boolean logicMove(int oldRow , int oldCol , int newRow , int newCol);
 
     public int[] getBlockPieces(Board board, int newRow, int newCol){
         return null;
@@ -50,4 +50,7 @@ public abstract class Piece {
     }
 
 
+    public boolean isWhite() {
+        return isWhite;
+    }
 }
