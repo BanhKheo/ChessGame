@@ -11,25 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Board {
-    private List<Piece> pieces;
 
     private List<int[]> validMoves = new ArrayList<>();
 
     private Piece selectedPiece;
 
     BufferedImage img;
-    private int[][] board = {
-            {1, 2, 3, 4, 5, 3, 2, 1},  // Black pieces
-            {6, 6, 6, 6, 6, 6, 6, 6},  // Black pawns
-            {0, 0, 0, 0, 0, 0, 0, 0},  // Empty
-            {0, 0, 0, 0, 0, 0, 0, 0},  // Empty
-            {0, 0, 0, 0, 0, 0, 0, 0},  // Empty
-            {0, 0, 0, 0, 0, 0, 0, 0},  // Empty
-            {6, 6, 6, 6, 6, 6, 6, 6},  // White pawns
-            {1, 2, 3, 4, 5, 3, 2, 1}   // White pieces
 
-    };
-
+    private Piece[][] board = new Piece[8][8];
 
 
     Board(){
@@ -45,7 +34,7 @@ public class Board {
         int col = x / Game.GAME_TILES;
         int row = y / Game.GAME_TILES;
         if( selectedPiece == null ){
-            selectedPiece = getPieceAt( col , row);
+            selectedPiece = board[row][col];
             if (selectedPiece != null) {
                 validMoves = getValidMoves(selectedPiece);
             }
@@ -60,53 +49,45 @@ public class Board {
     private void movePiece(Piece piece, int col, int row)
     {
         if( legalMove(piece , col , row)){
-            board[piece.getRow()][piece.getCol()] = 0;
-            piece.setCol(col);
+            board[piece.getRow()][piece.getCol()] = null;
             piece.setRow(row);
-            board[row][col] = getPiecesState(piece);
-
-            for(int i = 0 ; i < 8 ; i++){
-                for ( int j = 0 ; j < 8 ; j++){
-                    System.out.print(board[i][j] + " ");
-                }
-                System.out.println();
-            }
-
+            piece.setCol(col);
+            board[row][col] = piece;
 
         }
     }
 
 
-    private boolean legalMove( Piece piece , int col , int row ){
-        for(int i = 0 ; i < 8 ; i++)
-            for ( int j = 0 ; j < 8 ; j++){
-                if( board[row][col] == 0 && piece.logicMove(piece.getRow() , piece.getCol() , row , col , this))
-                    return true;
-            }
-        return false;
+    private boolean legalMove(Piece piece, int col, int row) {
+        return board[row][col] == null && piece.logicMove(piece.getRow(), piece.getCol(), row, col);
     }
 
-
-    public Piece getPieceAt(int col, int row) {
-        for( Piece p : pieces)
-            if( p.getCol() == col && p.getRow() == row )
-                return p;
-        return null;
-    }
 
     //Generate the initial position of pieces
     private void initializePieces() {
-        pieces = new ArrayList<>();
-        for (int i = 0; i < board.length; i++) {
-            boolean isWhite = (i >= 6); // White pieces are on rows 6 and 7 (ranks 2 and 1)
-            for (int j = 0; j < board[i].length; j++) {
-                switch (board[i][j]) {
-                    case ROOK -> pieces.add( new Rook(j, i , isWhite));
-                    case KNIGHT -> pieces.add(new Knight(j, i, isWhite));
-                    case BISHOP -> pieces.add(new Bishop(j, i, isWhite));
-                    case QUEEN -> pieces.add(new Queen(j, i, isWhite));
-                    case KING -> pieces.add(new King(j, i, isWhite));
-                    case PAWN -> pieces.add(new Pawn(j, i, isWhite));
+
+        int [][] initialBoard = {
+                {1, 2, 3, 4, 5, 3, 2, 1},  // Black pieces
+                {6, 6, 6, 6, 6, 6, 6, 6},  // Black pawns
+                {0, 0, 0, 0, 0, 0, 0, 0},  // Empty
+                {0, 0, 0, 0, 0, 0, 0, 0},  // Empty
+                {0, 0, 0, 0, 0, 0, 0, 0},  // Empty
+                {0, 0, 0, 0, 0, 0, 0, 0},  // Empty
+                {6, 6, 6, 6, 6, 6, 6, 6},  // White pawns
+                {1, 2, 3, 4, 5, 3, 2, 1}   // White pieces
+
+        };
+
+        for (int row = 0; row < 8; row++) {
+            boolean isWhite = (row >= 6); // White pieces are on rows 6 and 7 (ranks 2 and 1)
+            for (int col = 0; col < 8; col++) {
+                switch (initialBoard[row][col]) {
+                    case ROOK -> board[row][col] = new Rook( col , row , isWhite);
+                    case KNIGHT -> board[row][col] = new Knight( col , row , isWhite);
+                    case BISHOP -> board[row][col] = new Bishop( col , row , isWhite);
+                    case QUEEN -> board[row][col] = new Queen( col , row , isWhite);
+                    case KING -> board[row][col] = new King( col , row , isWhite);
+                    case PAWN -> board[row][col] = new Pawn( col , row , isWhite);
                     default -> {}
                 }
             }
@@ -115,36 +96,45 @@ public class Board {
 
     private List<int[]> getValidMoves(Piece piece) {
         List<int[]> moves = new ArrayList<>();
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                if (legalMove(piece, j, i)) {
-                    int[] block = piece.getBlockPieces(this, i, j);
-                    if (block == null || (block[0] == i && block[1] == j)) {
-                        moves.add(new int[]{j, i});  // Only add unblocked moves
-                    }
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                if (legalMove(piece, col, row) && !isBlocked(piece, row, col)) {
+                    moves.add(new int[]{col, row}); // Fix order
                 }
             }
         }
         return moves;
     }
 
-    public void draw(Graphics g){
+    private boolean isBlocked(Piece piece, int newRow, int newCol) {
+        int[] blockedPos = piece.getBlockPieces(this, newRow, newCol);
+        return blockedPos != null;  // If there's a blocking piece, return true
+    }
 
-        for( Piece p : pieces)
-            p.draw(g);
+    public Piece getPieceAt( int row , int col){
+        return board[row][col];
+    }
 
-        
-        // Draw valid move indicators
-        if (selectedPiece != null) {
-            g.setColor(new Color(169, 169, 169, 150));
-
-            // Adjusted greenish-gray color with transparency
-            for (int[] move : validMoves) {
-                int x = move[0] * Game.GAME_TILES;
-                int y = move[1] * Game.GAME_TILES;
-                g.fillOval(x + 28, y + 28, 32, 32); // Draw circle at valid move positions
+    public void draw(Graphics g) {
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                Piece p = board[row][col];
+                if (p != null) {
+                    p.draw(g);
+                }
             }
         }
 
+        // Draw legal move indicators
+        if (selectedPiece != null) {
+            g.setColor(new Color(169, 169, 169, 150));
+            for (int[] move : validMoves) {
+                int x = move[0] * Game.GAME_TILES;
+                int y = move[1] * Game.GAME_TILES;
+                if (!isBlocked(selectedPiece, move[1], move[0])) {
+                    g.fillOval(x + 28, y + 28, 32, 32);
+                }
+            }
+        }
     }
 }
