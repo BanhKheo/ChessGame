@@ -2,15 +2,32 @@ package chessPieces;
 
 import utilz.LoadImage;
 
-import java.awt.*;
+public class Pawn extends Piece {
+    private boolean isMove = false;
+    public Pawn( int x , int y , boolean isWhite){
 
-public class Pawn extends Pieces {
-    public Pawn( int x , int y){
-        super(x, y , LoadImage.GetAtlas(LoadImage.wp));
+        super(x, y , LoadImage.GetPieceImage(isWhite , "p") , isWhite);
     }
 
     @Override
-    public void update() {
+    public  boolean logicMove( int oldRow , int oldCol , int newRow , int newCol){
+        if( oldCol == newCol){
+            if(!isMove)
+            {
+                if( newRow == oldRow - 2 || newRow == oldRow - 1 ){
+                    isMove = true;
+                    return true;
+                }
+            }
+            else
+            {
+                if( newRow == oldRow - 1 )
+                    return true;
+            }
+        }
 
+
+
+        return false;
     }
 }
