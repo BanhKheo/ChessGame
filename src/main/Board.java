@@ -50,6 +50,9 @@ public class Board {
     {
         if( legalMove(piece , col , row)){
             board[piece.getRow()][piece.getCol()] = null;
+            if (piece instanceof Pawn pawn) {
+                pawn.setMove(true);
+            }
             piece.setRow(row);
             piece.setCol(col);
             board[row][col] = piece;
@@ -98,8 +101,17 @@ public class Board {
         List<int[]> moves = new ArrayList<>();
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
-                if (legalMove(piece, col, row) && !isBlocked(piece, row, col)) {
-                    moves.add(new int[]{col, row}); // Fix order
+                if (piece instanceof Pawn pawn) {
+                    boolean wasMoved = pawn.isMoved();
+                    if ( legalMove(piece, col, row) && !isBlocked(piece, row, col)) {
+                        moves.add(new int[] {col, row});
+                    }
+                    pawn.setMove(wasMoved);
+                }
+                else {
+                    if (legalMove(piece, col, row) && !isBlocked(piece, row, col)) {
+                        moves.add(new int[]{col, row}); // Fix order
+                    }
                 }
             }
         }
