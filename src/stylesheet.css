@@ -1,0 +1,92 @@
+/* Default Button Style */
+.button {
+    -fx-border-color: transparent;
+    -fx-background-color: #3A4558;
+    -fx-text-fill: white; /* Default text color */
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+}
+
+/* Icon inside Button */
+.button .glyph-icon {
+    -fx-fill: white; /* Default icon color */
+}
+
+/* Hover Effect */
+.button:hover {
+    -fx-background-color: white;
+    -fx-fill: black; /* Text turns black */
+}
+
+/* Hover Icon Effect */
+.button:hover .glyph-icon {
+    -fx-fill: black; /* Icon turns black */
+}
+
+/* Pressed (Clicked) Effect */
+.button:pressed {
+    -fx-background-color: #3A4558; /* Keep same background */
+    -fx-fill: red; /* Change text color to red when clicked */
+    -fx-border-color: transparent;
+}
+
+/* Pressed Icon Effect */
+.button:hover:pressed .glyph-icon {
+    -fx-fill: red; /* Icon turns red */
+}
+
+.opt {
+    -fx-background-color: gray;
+    -fx-background-radius: 20;
+}
+
+.opt:hover {
+    -fx-background-color: blue;
+    -fx-border-color: red;
+}
+
+/* Game mode buttons (Rapid, Blitz, Bullet) */
+.rectangle {
+    -fx-background-radius: 20;
+    -fx-fill: #bfbfbf;
+    -fx-stroke: transparent;
+    -fx-stroke-width: 1;
+}
+
+.rectangle:pressed {
+    -fx-fill: #EEEEEE;
+}
+
+/* Playing with buttons */
+.option {
+   -fx-background-color: #CACACA;
+      -fx-background-radius: 24 24 24 24;
+      -fx-cursor: hand;
+      -fx-border-color: transparent;
+      -fx-border-width: 2;
+      -fx-border-radius: 24 24 24 24;
+      -fx-transition: -fx-background-color 0.3s;
+}
+
+/* Pressed state for playing with buttons */
+.option:pressed {
+    -fx-background-color: red;
+    -fx-border-color: black; // bo dong nay
+}
+
+/* Play button */
+.play-button {
+    -fx-background-color: #069525;
+    -fx-background-radius: 0 0 24 24;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-border-width: 2;
+    -fx-border-radius: 0 0 24 24;
+    -fx-transition: -fx-background-color 0.3s;
+}
+
+/* Pressed state for play button */
+.play-button:pressed {
+    -fx-background-color: #069525;
+    -fx-border-color: transparent;
+}

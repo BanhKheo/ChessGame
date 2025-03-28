@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="489.0" prefWidth="774.0" style="-fx-background-color: #4E4E4E; -fx-background-radius: 5; -fx-border-radius: 5;" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <ImageView fitHeight="331.0" fitWidth="774.0" layoutY="169.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@res/StartingGame.png" />
+         </image>
+      </ImageView>
+      <Text fill="#069525" layoutX="194.0" layoutY="69.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Mini Chess">
+         <font>
+            <Font name="Consolas Bold Italic" size="90.0" />
+         </font>
+      </Text>
+      <Text fill="#3caa54" layoutX="270.0" layoutY="104.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Play against computer AI or a friend">
+         <font>
+            <Font name="Consolas Bold" size="16.0" />
+         </font>
+      </Text>
+      <AnchorPane fx:id="playWithPerson" layoutX="45.0" layoutY="146.0" prefHeight="45.0" prefWidth="310.0" style="-fx-background-color: #739552; -fx-background-radius: 10; -fx-cursor: hand;">
+         <effect>
+            <DropShadow blurType="ONE_PASS_BOX" />
+         </effect>
+         <children>
+            <Text fill="WHITE" layoutX="25.0" layoutY="28.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Start Game With Person">
+               <font>
+                  <Font name="Consolas Bold" size="22.0" />
+               </font>
+            </Text>
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="playWithBot" layoutX="422.0" layoutY="146.0" prefHeight="45.0" prefWidth="310.0" style="-fx-background-color: #739552; -fx-background-radius: 10; -fx-cursor: hand;">
+         <effect>
+            <DropShadow blurType="ONE_PASS_BOX" />
+         </effect>
+         <children>
+            <Text fill="WHITE" layoutX="39.0" layoutY="30.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Start Game With Bot">
+               <font>
+                  <Font name="Consolas Bold" size="22.0" />
+               </font>
+            </Text>
+         </children>
+      </AnchorPane>
+   </children>
+</AnchorPane>
