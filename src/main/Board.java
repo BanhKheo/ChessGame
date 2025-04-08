@@ -1,14 +1,12 @@
 package main;
 
 import chessPieces.*;
-
-import static utilz.LoadImage.*;
-import static utilz.Constants.*;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import static utilz.Constants.*;
+import static utilz.LoadImage.*;
 
 public class Board {
 
@@ -20,6 +18,8 @@ public class Board {
 
     private Piece[][] board = new Piece[8][8];
 
+    private boolean whiteTurn = true;
+
 
     Board(){
         img = GetAtlas(boardBackground);
@@ -30,22 +30,31 @@ public class Board {
 
 
     //Handle the selected pieces when on click
-    public void handleSelectedPiece( int x , int y ){
+    public void handleSelectedPiece(int x, int y) {
         int col = x / Game.GAME_TILES;
         int row = y / Game.GAME_TILES;
-        if( selectedPiece == null ){
-            selectedPiece = board[row][col];
-            if (selectedPiece != null) {
+    
+        if (col < 0 || col >= 8 || row < 0 || row >= 8) {
+            return;
+        }
+    
+        Piece clickedPiece = board[row][col];
+    
+        if (selectedPiece == null) {
+            //Check whether accuracy turn 
+            if (clickedPiece != null && clickedPiece.isWhite() == whiteTurn) {
+                selectedPiece = clickedPiece;
                 validMoves = getValidMoves(selectedPiece);
             }
-            System.out.println(selectedPiece);
-        }
-        else
-        {
+        } else {
+            //Move piece
             movePiece(selectedPiece, col, row);
             selectedPiece = null;
         }
     }
+    
+
+    
     private void movePiece(Piece piece, int col, int row)
     {
         if( legalMove(piece , col , row)){
@@ -57,12 +66,34 @@ public class Board {
             piece.setCol(col);
             board[row][col] = piece;
 
+            whiteTurn = !whiteTurn;
         }
     }
 
 
     private boolean legalMove(Piece piece, int col, int row) {
-        return board[row][col] == null && piece.logicMove(piece.getRow(), piece.getCol(), row, col);
+
+        //Handle piece satisfy logic move
+        if(!piece.logicMove(piece.getRow(), piece.getCol(), row, col)){
+            return false;
+        }
+
+
+
+        // Check if there are blocking pieces (for pieces that move in straight lines)
+        if (piece.getBlockPieces(this, row, col) != null) {
+            return false;  // A piece is blocking the way
+        }
+
+        
+
+        //prevent capturing own piece
+        Piece targetPiece = board[row][col];
+        if (targetPiece != null && targetPiece.isWhite() == piece.isWhite()) {
+            return false;
+        }
+        
+        return true;
     }
 
 
