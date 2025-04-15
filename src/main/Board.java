@@ -74,7 +74,7 @@ public class Board {
     private boolean legalMove(Piece piece, int col, int row) {
 
         //Handle piece satisfy logic move
-        if(!piece.logicMove(piece.getRow(), piece.getCol(), row, col)){
+        if(!piece.logicMove(piece.getRow(), piece.getCol(), row, col , board)){
             return false;
         }
 
@@ -85,14 +85,14 @@ public class Board {
             return false;  // A piece is blocking the way
         }
 
-        
+
 
         //prevent capturing own piece
         Piece targetPiece = board[row][col];
         if (targetPiece != null && targetPiece.isWhite() == piece.isWhite()) {
             return false;
         }
-        
+
         return true;
     }
 
