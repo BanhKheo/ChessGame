@@ -4,15 +4,22 @@ import main.Board;
 import utilz.LoadImage;
 
 public class Rook extends Piece {
-    private boolean isMove;
+    private boolean isMove = false;
 
     public Rook(int x, int y, boolean isWhite) {
         super(x, y, LoadImage.GetPieceImage(isWhite, "r"), isWhite);
     }
 
     @Override
-    public boolean logicMove(int oldRow, int oldCol, int newRow, int newCol) {
-        return oldCol == newCol || oldRow == newRow;
+    public boolean logicMove(int oldRow, int oldCol, int newRow, int newCol, Piece[][] board) {
+        if (oldCol == newCol || oldRow == newRow) {
+            Piece target = board[newRow][newCol];
+            if (target == null || target.isWhite != this.isWhite) {
+                isMove = true;
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -46,4 +53,13 @@ public class Rook extends Piece {
 
         return null; // No blocking piece
     }
+
+    public boolean isMoved() {
+        return isMove;
+    }
+
+    public void setMove(boolean moved) {
+        this.isMove = moved;
+    }
+
 }

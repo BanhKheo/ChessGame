@@ -9,7 +9,7 @@ public class Knight extends Piece {
     }
 
     @Override
-    public  boolean logicMove( int oldRow , int oldCol , int newRow , int newCol){
+    public  boolean logicMove( int oldRow , int oldCol , int newRow , int newCol, Piece[][] board){
         int rowDiff = Math.abs(newRow - oldRow);
         int colDiff = Math.abs(newCol - oldCol);
 

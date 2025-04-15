@@ -74,7 +74,11 @@ public class Board {
     private boolean legalMove(Piece piece, int col, int row) {
 
         //Handle piece satisfy logic move
+<<<<<<< logicMove
+        if(!piece.logicMove(piece.getRow(), piece.getCol(), row, col, board)){
+=======
         if(!piece.logicMove(piece.getRow(), piece.getCol(), row, col)){
+>>>>>>> DesignGame
             return false;
         }
 

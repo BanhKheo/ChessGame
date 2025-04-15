@@ -4,16 +4,24 @@ import main.Board;
 import utilz.LoadImage;
 
 public class Queen extends Piece {
+//    private boolean isMove = false;
     public Queen( int x , int y ,  boolean isWhite){
         super(x, y , LoadImage.GetPieceImage(isWhite , "q") , isWhite);
 
     }
 
     @Override
-    public  boolean logicMove( int oldRow , int oldCol , int newRow , int newCol ){
-        return Math.abs(oldCol - newCol) == Math.abs(oldRow - newRow)
+    public  boolean logicMove( int oldRow , int oldCol , int newRow , int newCol, Piece[][] board){
+        if (Math.abs(oldCol - newCol) == Math.abs(oldRow - newRow)
                 || oldRow == newRow
-                || oldCol == newCol ;
+                || oldCol == newCol) {
+            Piece target = board[newRow][newCol];
+            if (target == null || target.isWhite != this.isWhite) {
+//                isMove = true;
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
