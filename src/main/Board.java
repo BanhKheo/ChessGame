@@ -1,28 +1,28 @@
 package main;
 
 import chessPieces.*;
+import javafx.fxml.FXML;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 
-import static utilz.LoadImage.*;
 import static utilz.Constants.*;
-
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Board {
 
+
     private List<int[]> validMoves = new ArrayList<>();
 
     private Piece selectedPiece;
 
-    BufferedImage img;
 
     private Piece[][] board = new Piece[8][8];
 
+    private boolean whiteTurn = true;
+
 
     Board(){
-        img = GetAtlas(boardBackground);
         initializePieces();
     }
 
@@ -30,22 +30,31 @@ public class Board {
 
 
     //Handle the selected pieces when on click
-    public void handleSelectedPiece( int x , int y ){
+    public void handleSelectedPiece(int x, int y) {
         int col = x / Game.GAME_TILES;
         int row = y / Game.GAME_TILES;
-        if( selectedPiece == null ){
-            selectedPiece = board[row][col];
-            if (selectedPiece != null) {
+
+        if (col < 0 || col >= 8 || row < 0 || row >= 8) {
+            return;
+        }
+
+        Piece clickedPiece = board[row][col];
+
+        if (selectedPiece == null) {
+            //Check whether accuracy turn
+            if (clickedPiece != null && clickedPiece.isWhite() == whiteTurn) {
+                selectedPiece = clickedPiece;
                 validMoves = getValidMoves(selectedPiece);
             }
-            System.out.println(selectedPiece);
-        }
-        else
-        {
+        } else {
+            //Move piece
             movePiece(selectedPiece, col, row);
             selectedPiece = null;
         }
     }
+
+
+
     private void movePiece(Piece piece, int col, int row)
     {
         if( legalMove(piece , col , row)){
@@ -57,12 +66,34 @@ public class Board {
             piece.setCol(col);
             board[row][col] = piece;
 
+            whiteTurn = !whiteTurn;
         }
     }
 
 
     private boolean legalMove(Piece piece, int col, int row) {
-        return board[row][col] == null && piece.logicMove(piece.getRow(), piece.getCol(), row, col);
+
+        //Handle piece satisfy logic move
+        if(!piece.logicMove(piece.getRow(), piece.getCol(), row, col , board)){
+            return false;
+        }
+
+
+
+        // Check if there are blocking pieces (for pieces that move in straight lines)
+        if (piece.getBlockPieces(this, row, col) != null) {
+            return false;  // A piece is blocking the way
+        }
+
+
+
+        //prevent capturing own piece
+        Piece targetPiece = board[row][col];
+        if (targetPiece != null && targetPiece.isWhite() == piece.isWhite()) {
+            return false;
+        }
+
+        return true;
     }
 
 
@@ -126,27 +157,53 @@ public class Board {
     public Piece getPieceAt( int row , int col){
         return board[row][col];
     }
+    public void draw(AnchorPane boardGame) {
 
-    public void draw(Graphics g) {
+        boardGame.getChildren().clear();
+        // Draw pieces using JavaFX ImageViews
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 Piece p = board[row][col];
                 if (p != null) {
-                    p.draw(g);
+                    p.draw(boardGame); // Use your existing JavaFX draw method
                 }
             }
         }
 
-        // Draw legal move indicators
+        // Draw legal move indicators as transparent circles
         if (selectedPiece != null) {
-            g.setColor(new Color(169, 169, 169, 150));
             for (int[] move : validMoves) {
-                int x = move[0] * Game.GAME_TILES;
-                int y = move[1] * Game.GAME_TILES;
                 if (!isBlocked(selectedPiece, move[1], move[0])) {
-                    g.fillOval(x + 28, y + 28, 32, 32);
+                    javafx.scene.shape.Circle circle = new javafx.scene.shape.Circle();
+                    circle.setRadius(16);
+                    circle.setCenterX(move[0] * Game.GAME_TILES + Game.GAME_TILES / 2);
+                    circle.setCenterY(move[1] * Game.GAME_TILES + Game.GAME_TILES / 2);
+                    circle.setFill(javafx.scene.paint.Color.rgb(169, 169, 169, 0.6));
+                    boardGame.getChildren().add(circle);
                 }
             }
         }
     }
+
+
+
+
+
+    public Piece getSelectedPiece() {
+        return selectedPiece;
+    }
+
+    public void setSelectedPiece(Piece piece) {
+        this.selectedPiece = piece;
+    }
+
+    public List<int[]> getValidMoves() {
+        return validMoves;
+    }
+
+    public boolean isWhiteTurn() {
+        return whiteTurn;
+    }
+
+
 }

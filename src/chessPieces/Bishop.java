@@ -4,13 +4,22 @@ import main.Board;
 import utilz.LoadImage;
 
 public class Bishop extends Piece {
+//    private boolean isMove = false;
+
     public Bishop(int x, int y, boolean isWhite) {
         super(x, y, LoadImage.GetPieceImage(isWhite, "b"), isWhite);
     }
 
     @Override
-    public boolean logicMove(int oldRow, int oldCol, int newRow, int newCol) {
-        return Math.abs(oldRow - newRow) == Math.abs(oldCol - newCol);
+    public boolean logicMove(int oldRow, int oldCol, int newRow, int newCol, Piece[][] board) {
+        if (Math.abs(newRow - oldRow) == Math.abs(newCol - oldCol)) {
+            Piece target = board[newRow][newCol];
+            if (target == null || target.isWhite != this.isWhite) {
+//                isMove = true;
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
