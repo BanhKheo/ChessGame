@@ -1,29 +1,50 @@
 package chessPieces;
 
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 import main.Board;
 import main.Game;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
+
 
 public abstract class Piece {
     protected int col;
     protected int row;
+    protected boolean isWhite;
+
     protected int height;
     protected int width;
-    protected BufferedImage img;
-    protected boolean isWhite;
-    public Piece(int col, int row, BufferedImage img , boolean isWhite){
+
+    protected Image img;
+
+    public Piece(int col, int row, Image img , boolean isWhite){
         this.col = col;
         this.row = row;
-        height = 90;
-        width = 90;
+        height = 80;
+        width = 80;
         this.img = img;
         this.isWhite = isWhite;
     }
 
-    public void draw(Graphics g){
-        g.drawImage( img , col * Game.GAME_TILES, row * Game.GAME_TILES, width , height , null);
+    public void draw( AnchorPane pane){
+        ImageView imageView = new ImageView(img);
+
+        // Set position and size
+        imageView.setX(col * Game.GAME_TILES);
+        imageView.setY(row * Game.GAME_TILES);
+        imageView.setFitWidth(width);
+        imageView.setFitHeight(height);
+
+        imageView.setSmooth(false); // This disables smoothing (blurring)
+        imageView.setPreserveRatio(true); // Optional, keeps aspect ratio
+
+
+        // Add to scene or pane
+        pane.getChildren().add(imageView);
+
     }
 
 

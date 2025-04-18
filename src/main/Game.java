@@ -1,96 +1,77 @@
 package main;
 
+import javafx.animation.AnimationTimer;
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+
 import java.awt.*;
+import java.io.IOException;
 
-public class Game implements Runnable {
-    private GameWindow window;
-    private GamePanel panel;
-    private Board board;
+public class Game extends Application {
+   private Board board;
+   public static final int GAME_TILES = 88;
 
-    //Global variable
-    public static final int GAME_WIDTH = 720;
-    public static final int GAME_HEIGHT = 720;
+   private MainMenuController mainController;
 
-    public static final int GAME_TILES = 90;
+   private Scene mainScene;
+   private Scene chessScene;
 
+   private ChessController chessController;
 
-    //Game loop variable
-    private Thread gameThread;
-    private final int FPS_SET = 120;
-    private final int UPS_SET = 200;
+   @Override
+   public void start(Stage stage) throws IOException {
+      board = new Board();
 
-    Game(){
-        initialClasses();
-        panel = new GamePanel(this , board);
-        window = new GameWindow(panel);
-        startGameLoop();
+      // Load main menu FXML
+      FXMLLoader mainLoader = new FXMLLoader(Game.class.getResource("/MainPage.fxml"));
+      mainScene = new Scene(mainLoader.load(), 774, 489);
+      mainController = mainLoader.getController();
 
+      if (mainController == null) {
+         throw new IllegalStateException("Failed to load MainMenuController from FXML");
+      }
 
-    }
-    private void initialClasses()
-    {
-        board = new Board();
+      mainController.setGame(this);
 
-    }
+      // Load chess game FXML
+      FXMLLoader chessLoader = new FXMLLoader(Game.class.getResource("/GameBoard.fxml"));
+      chessScene = new Scene(chessLoader.load(), 1170, 792);
+      chessController = chessLoader.getController();
 
-    private void startGameLoop() {
-        gameThread = new Thread(this);
-        gameThread.start();
-    }
+      if (chessController == null) {
+         throw new IllegalStateException("ChessController was not injected properly");
+      }
+      chessController.setBoard(board);
 
-    private void update() {
-
-    }
-
-    public void render(Graphics g)
-    {
-        board.draw(g);
-    }
-    @Override
-    public void run() {
-
-
-        double timePerFrame = 1000000000.0 / FPS_SET;
-        double timePerUpdate = 1000000000.0 / UPS_SET;
-
-        long previousTime = System.nanoTime();
-
-        int frames = 0;
-        int updates = 0;
-        long lastCheck = System.currentTimeMillis();
-
-        double deltaU = 0;
-        double deltaF = 0;
-
-        while (true) {
-            long currentTime = System.nanoTime();
-
-            deltaU += (currentTime - previousTime) / timePerUpdate;
-            deltaF += (currentTime - previousTime) / timePerFrame;
-            previousTime = currentTime;
-
-            if (deltaU >= 1) {
-                update();
-                updates++;
-                deltaU--;
+      // Game loop
+      new AnimationTimer() {
+         @Override
+         public void handle(long now)  {
+            if(stage.getScene() == chessScene) {
+               chessController.redraw();
             }
+         }
+      }.start();
 
-            if (deltaF >= 1) {
-                panel.repaint();
-                frames++;
-                deltaF--;
-            }
+      // Set up and show the initial stage
+      stage.setTitle("Chess Game");
+      stage.setScene(mainScene);
+      stage.setResizable(false);
+      stage.show();
+   }
 
-            if (System.currentTimeMillis() - lastCheck >= 1000) {
-                lastCheck = System.currentTimeMillis();
-                System.out.println("FPS: " + frames + " | UPS: " + updates);
-                frames = 0;
-                updates = 0;
 
-            }
-        }
 
-    }
+   public void switchToChessScene() {
+      Stage stage = (Stage) mainScene.getWindow();
+      stage.setScene(chessScene);
+      stage.centerOnScreen();
+   }
 
+   public static void main(String[] args) {
+      launch(args);
+   }
 
 }

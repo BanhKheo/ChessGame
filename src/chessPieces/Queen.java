@@ -4,7 +4,9 @@ import main.Board;
 import utilz.LoadImage;
 
 public class Queen extends Piece {
-//    private boolean isMove = false;
+
+    //    private boolean isMove = false;
+
     public Queen( int x , int y ,  boolean isWhite){
         super(x, y , LoadImage.GetPieceImage(isWhite , "q") , isWhite);
 
