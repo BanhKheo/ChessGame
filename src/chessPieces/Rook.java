@@ -14,10 +14,7 @@ public class Rook extends Piece {
     public boolean logicMove(int oldRow, int oldCol, int newRow, int newCol, Piece[][] board) {
         if (oldCol == newCol || oldRow == newRow) {
             Piece target = board[newRow][newCol];
-            if (target == null || target.isWhite != this.isWhite) {
-                isMove = true;
-                return true;
-            }
+            return target == null || target.isWhite != this.isWhite;
         }
         return false;
     }
