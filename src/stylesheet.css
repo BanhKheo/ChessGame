@@ -2,37 +2,37 @@
 .button {
     -fx-border-color: transparent;
     -fx-background-color: #3A4558;
-    -fx-text-fill: white; /* Default text color */
+    -fx-text-fill: white;
     -fx-background-radius: 8px;
     -fx-border-radius: 8px;
 }
 
 /* Icon inside Button */
 .button .glyph-icon {
-    -fx-fill: white; /* Default icon color */
+    -fx-fill: white;
 }
 
 /* Hover Effect */
 .button:hover {
     -fx-background-color: white;
-    -fx-fill: black; /* Text turns black */
+    -fx-fill: black;
 }
 
 /* Hover Icon Effect */
 .button:hover .glyph-icon {
-    -fx-fill: black; /* Icon turns black */
+    -fx-fill: black;
 }
 
 /* Pressed (Clicked) Effect */
 .button:pressed {
-    -fx-background-color: #3A4558; /* Keep same background */
-    -fx-fill: red; /* Change text color to red when clicked */
+    -fx-background-color: #3A4558;
+    -fx-fill: red;
     -fx-border-color: transparent;
 }
 
 /* Pressed Icon Effect */
 .button:hover:pressed .glyph-icon {
-    -fx-fill: red; /* Icon turns red */
+    -fx-fill: red;
 }
 
 .opt {
@@ -48,13 +48,50 @@
 /* Game mode buttons (Rapid, Blitz, Bullet) */
 .rectangle {
     -fx-background-radius: 20;
-    -fx-fill: #bfbfbf;
+    -fx-fill: #D1D1D1;
     -fx-stroke: transparent;
     -fx-stroke-width: 1;
 }
 
 .rectangle:pressed {
     -fx-fill: #EEEEEE;
+}
+
+/* Selected state for game mode buttons */
+.rectangle-selected {
+    -fx-fill: #FFFFFF;
+}
+
+/* Styles for Game Status and New Game tabs */
+.tab-active {
+    -fx-border-radius: 24 0 0 0;
+    -fx-border-color: black;
+    -fx-cursor: hand;
+}
+
+.tab-inactive {
+    -fx-border-radius: 24 0 0 0;
+    -fx-border-color: black;
+    -fx-background-color: #DBDBDB;
+    -fx-background-radius: 24 0 0 0;
+    -fx-cursor: hand;
+}
+
+/* Specific styles for New Game tabs */
+.tab-new-game-active {
+    -fx-border-radius: 0 24 0 0;
+    -fx-border-color: black;
+    -fx-background-color: white;
+    -fx-background-radius: 0 24 0 0;
+    -fx-cursor: hand;
+}
+
+.tab-new-game-inactive {
+    -fx-border-radius: 0 24 0 0;
+    -fx-border-color: black;
+    -fx-background-color: #DBDBDB;
+    -fx-background-radius: 0 24 0 0;
+    -fx-cursor: hand;
 }
 
 /* Playing with buttons */
@@ -71,7 +108,7 @@
 /* Pressed state for playing with buttons */
 .option:pressed {
     -fx-background-color: red;
-    -fx-border-color: black; // bo dong nay
+    -fx-border-color: black;
 }
 
 /* Play button */

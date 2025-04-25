@@ -11,7 +11,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<Pane fx:id="playingChessPage" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="792.0" prefWidth="1170.0" style="-fx-background-color: #373232;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.ChessController">
+<Pane fx:id="playingChessPage" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="792.0" prefWidth="1170.0" style="-fx-background-color: #373232;" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.ChessController">
    <children>
       <AnchorPane layoutX="40.0" layoutY="2.0" prefHeight="31.0" prefWidth="165.0" style="-fx-background-color: FFFFFF; -fx-background-radius: 10;">
          <children>
@@ -39,7 +39,7 @@
                   <Image url="@res/image2.png" />
                </image>
             </ImageView>
-            <Text layoutX="61.0" layoutY="29.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Player 1">
+            <Text fx:id="player1Name" layoutX="61.0" layoutY="29.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Player 1">
                <font>
                   <Font name="Consolas Bold" size="22.0" />
                </font>
@@ -50,7 +50,7 @@
          <children>
             <AnchorPane layoutY="-1.0" prefHeight="87.5" prefWidth="87.5" style="-fx-background-color: EBECD0;">
                <children>
-                  <Text fill="#739552" layoutX="8.0" layoutY="20.0" strokeType="OUTSIDE" strokeWidth="0.0" text="1">
+                  <Text fill="#739552" layoutX="8.0" layoutY="20.0" strokeType="OUTSIDE" strokeWidth="0.0" text="8">
                      <font>
                         <Font name="Consolas Bold" size="22.0" />
                      </font>
@@ -66,7 +66,7 @@
             <AnchorPane layoutX="616.0" layoutY="-1.0" prefHeight="87.5" prefWidth="87.5" style="-fx-background-color: #739552;" />
             <AnchorPane layoutY="86.0" prefHeight="87.5" prefWidth="87.5" style="-fx-background-color: #739552;">
                <children>
-                  <Text fill="#ebecd0" layoutX="5.0" layoutY="20.0" strokeType="OUTSIDE" strokeWidth="0.0" text="2">
+                  <Text fill="#ebecd0" layoutX="5.0" layoutY="20.0" strokeType="OUTSIDE" strokeWidth="0.0" text="7">
                      <font>
                         <Font name="Consolas Bold" size="22.0" />
                      </font>
@@ -82,7 +82,7 @@
             <AnchorPane layoutX="616.0" layoutY="87.0" prefHeight="87.5" prefWidth="87.5" style="-fx-background-color: EBECD0;" />
             <AnchorPane layoutY="174.0" prefHeight="87.5" prefWidth="87.5" style="-fx-background-color: EBECD0;">
                <children>
-                  <Text fill="#739552" layoutX="5.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="3">
+                  <Text fill="#739552" layoutX="5.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="6">
                      <font>
                         <Font name="Consolas Bold" size="22.0" />
                      </font>
@@ -98,7 +98,7 @@
             <AnchorPane layoutX="616.0" layoutY="176.0" prefHeight="87.5" prefWidth="87.5" style="-fx-background-color: #739552;" />
             <AnchorPane layoutY="262.0" prefHeight="87.5" prefWidth="87.5" style="-fx-background-color: #739552;">
                <children>
-                  <Text fill="#ebecd0" layoutX="5.0" layoutY="20.0" strokeType="OUTSIDE" strokeWidth="0.0" text="4">
+                  <Text fill="#ebecd0" layoutX="5.0" layoutY="20.0" strokeType="OUTSIDE" strokeWidth="0.0" text="5">
                      <font>
                         <Font name="Consolas Bold" size="22.0" />
                      </font>
@@ -114,7 +114,7 @@
             <AnchorPane layoutX="616.0" layoutY="264.0" prefHeight="87.5" prefWidth="87.5" style="-fx-background-color: EBECD0;" />
             <AnchorPane layoutY="526.0" prefHeight="87.5" prefWidth="87.5" style="-fx-background-color: EBECD0;">
                <children>
-                  <Text fill="#739552" layoutX="5.0" layoutY="20.0" strokeType="OUTSIDE" strokeWidth="0.0" text="7">
+                  <Text fill="#739552" layoutX="5.0" layoutY="20.0" strokeType="OUTSIDE" strokeWidth="0.0" text="2">
                      <font>
                         <Font name="Consolas Bold" size="22.0" />
                      </font>
@@ -126,12 +126,12 @@
             <AnchorPane layoutX="264.0" layoutY="527.0" prefHeight="87.5" prefWidth="87.5" style="-fx-background-color: #739552;" />
             <AnchorPane layoutY="614.0" prefHeight="87.5" prefWidth="87.5" style="-fx-background-color: #739552;">
                <children>
-                  <Text fill="#ebecd0" layoutX="5.0" layoutY="20.0" strokeType="OUTSIDE" strokeWidth="0.0" text="8">
+                  <Text fill="#ebecd0" layoutX="5.0" layoutY="20.0" strokeType="OUTSIDE" strokeWidth="0.0" text="1">
                      <font>
                         <Font name="Consolas Bold" size="22.0" />
                      </font>
                   </Text>
-                  <Text fill="#ebecd0" layoutX="73.0" layoutY="83.0" strokeType="OUTSIDE" strokeWidth="0.0" text="h">
+                  <Text fill="#ebecd0" layoutX="73.0" layoutY="83.0" strokeType="OUTSIDE" strokeWidth="0.0" text="a">
                      <font>
                         <Font name="Consolas Bold" size="22.0" />
                      </font>
@@ -140,21 +140,16 @@
             </AnchorPane>
             <AnchorPane layoutX="88.0" layoutY="614.0" prefHeight="87.5" prefWidth="87.5" style="-fx-background-color: EBECD0;">
                <children>
-                  <Text fill="#739552" layoutX="73.0" layoutY="83.0" strokeType="OUTSIDE" strokeWidth="0.0" text="g">
+                  <Text fill="#739552" layoutX="73.0" layoutY="83.0" strokeType="OUTSIDE" strokeWidth="0.0" text="b">
                      <font>
                         <Font name="Consolas Bold" size="22.0" />
                      </font>
                   </Text>
                </children>
             </AnchorPane>
-            <Text fill="#739552" layoutX="73.0" layoutY="82.0" strokeType="OUTSIDE" strokeWidth="0.0" text="g">
-               <font>
-                  <Font name="Consolas Bold" size="22.0" />
-               </font>
-            </Text>
             <AnchorPane layoutX="176.0" layoutY="614.0" prefHeight="87.5" prefWidth="87.5" style="-fx-background-color: #739552;">
                <children>
-                  <Text fill="#ebecd0" layoutX="73.0" layoutY="83.0" strokeType="OUTSIDE" strokeWidth="0.0" text="f">
+                  <Text fill="#ebecd0" layoutX="73.0" layoutY="83.0" strokeType="OUTSIDE" strokeWidth="0.0" text="c">
                      <font>
                         <Font name="Consolas Bold" size="22.0" />
                      </font>
@@ -163,7 +158,7 @@
             </AnchorPane>
             <AnchorPane layoutX="264.0" layoutY="614.0" prefHeight="87.5" prefWidth="87.5" style="-fx-background-color: EBECD0;">
                <children>
-                  <Text fill="#739552" layoutX="73.0" layoutY="83.0" strokeType="OUTSIDE" strokeWidth="0.0" text="e">
+                  <Text fill="#739552" layoutX="73.0" layoutY="83.0" strokeType="OUTSIDE" strokeWidth="0.0" text="d">
                      <font>
                         <Font name="Consolas Bold" size="22.0" />
                      </font>
@@ -176,7 +171,7 @@
             <AnchorPane layoutX="616.0" layoutY="528.0" prefHeight="87.5" prefWidth="87.5" style="-fx-background-color: #739552;" />
             <AnchorPane layoutX="352.0" layoutY="615.0" prefHeight="87.5" prefWidth="87.5" style="-fx-background-color: #739552;">
                <children>
-                  <Text fill="#ebecd0" layoutX="73.0" layoutY="83.0" strokeType="OUTSIDE" strokeWidth="0.0" text="d">
+                  <Text fill="#ebecd0" layoutX="73.0" layoutY="83.0" strokeType="OUTSIDE" strokeWidth="0.0" text="e">
                      <font>
                         <Font name="Consolas Bold" size="22.0" />
                      </font>
@@ -185,7 +180,7 @@
             </AnchorPane>
             <AnchorPane layoutX="440.0" layoutY="615.0" prefHeight="87.5" prefWidth="87.5" style="-fx-background-color: EBECD0;">
                <children>
-                  <Text fill="#739552" layoutX="73.0" layoutY="83.0" strokeType="OUTSIDE" strokeWidth="0.0" text="c">
+                  <Text fill="#739552" layoutX="73.0" layoutY="83.0" strokeType="OUTSIDE" strokeWidth="0.0" text="f">
                      <font>
                         <Font name="Consolas Bold" size="22.0" />
                      </font>
@@ -194,7 +189,7 @@
             </AnchorPane>
             <AnchorPane layoutX="528.0" layoutY="615.0" prefHeight="87.5" prefWidth="87.5" style="-fx-background-color: #739552;">
                <children>
-                  <Text fill="#ebecd0" layoutX="73.0" layoutY="83.0" strokeType="OUTSIDE" strokeWidth="0.0" text="b">
+                  <Text fill="#ebecd0" layoutX="73.0" layoutY="83.0" strokeType="OUTSIDE" strokeWidth="0.0" text="g">
                      <font>
                         <Font name="Consolas Bold" size="22.0" />
                      </font>
@@ -203,7 +198,7 @@
             </AnchorPane>
             <AnchorPane layoutX="616.0" layoutY="616.0" prefHeight="87.5" prefWidth="87.5" style="-fx-background-color: EBECD0;">
                <children>
-                  <Text fill="#739552" layoutX="73.0" layoutY="83.0" strokeType="OUTSIDE" strokeWidth="0.0" text="a">
+                  <Text fill="#739552" layoutX="73.0" layoutY="83.0" strokeType="OUTSIDE" strokeWidth="0.0" text="h">
                      <font>
                         <Font name="Consolas Bold" size="22.0" />
                      </font>
@@ -212,7 +207,7 @@
             </AnchorPane>
             <AnchorPane layoutY="350.0" prefHeight="87.5" prefWidth="87.5" style="-fx-background-color: EBECD0;">
                <children>
-                  <Text fill="#739552" layoutX="5.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="5">
+                  <Text fill="#739552" layoutX="5.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="4">
                      <font>
                         <Font name="Consolas Bold" size="22.0" />
                      </font>
@@ -228,7 +223,7 @@
             <AnchorPane layoutX="616.0" layoutY="352.0" prefHeight="87.5" prefWidth="87.5" style="-fx-background-color: #739552;" />
             <AnchorPane layoutY="438.0" prefHeight="87.5" prefWidth="87.5" style="-fx-background-color: #739552;">
                <children>
-                  <Text fill="#ebecd0" layoutX="5.0" layoutY="20.0" strokeType="OUTSIDE" strokeWidth="0.0" text="6">
+                  <Text fill="#ebecd0" layoutX="5.0" layoutY="20.0" strokeType="OUTSIDE" strokeWidth="0.0" text="3">
                      <font>
                         <Font name="Consolas Bold" size="22.0" />
                      </font>
@@ -264,7 +259,7 @@
       </AnchorPane>
       <AnchorPane fx:id="gameStatusPage" layoutX="803.0" layoutY="22.0" prefHeight="760.0" prefWidth="332.0" style="-fx-background-color: FFFFFF; -fx-background-radius: 24;" stylesheets="@stylesheet.css">
          <children>
-            <AnchorPane fx:id="StatusPageOn" prefHeight="92.0" prefWidth="166.0" style="-fx-border-radius: 24 0 0 0; -fx-border-color: black; -fx-cursor: hand;" stylesheets="@stylesheet.css">
+            <AnchorPane fx:id="StatusPageOn" prefHeight="92.0" prefWidth="166.0" styleClass="tab-active">
                <children>
                   <ImageView fitHeight="50.0" fitWidth="50.0" layoutX="58.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -278,7 +273,7 @@
                   </Text>
                </children>
             </AnchorPane>
-            <AnchorPane fx:id="newGamePageOff" layoutX="166.0" prefHeight="92.0" prefWidth="166.0" style="-fx-border-radius: 0 24 0 0; -fx-border-color: black; -fx-background-color: DBDBDB; -fx-background-radius: 0 24 0 0; -fx-cursor: hand;">
+            <AnchorPane fx:id="newGamePageOff" layoutX="166.0" prefHeight="92.0" prefWidth="166.0" styleClass="tab-new-game-inactive">
                <children>
                   <ImageView fitHeight="50.0" fitWidth="50.0" layoutX="45.0" layoutY="7.0" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -441,7 +436,7 @@
       </AnchorPane>
       <AnchorPane fx:id="newGamePage" layoutX="803.0" layoutY="23.0" prefHeight="760.0" prefWidth="332.0" style="-fx-background-color: FFFFFF; -fx-background-radius: 24;" stylesheets="@stylesheet.css" visible="false">
          <children>
-            <AnchorPane fx:id="StatusPageOff" prefHeight="92.0" prefWidth="166.0" style="-fx-border-radius: 24 0 0 0; -fx-border-color: black; -fx-cursor: hand; -fx-background-color: DBDBDB; -fx-background-radius: 24 0 0 0;" stylesheets="@stylesheet.css">
+            <AnchorPane fx:id="StatusPageOff" prefHeight="92.0" prefWidth="166.0" styleClass="tab-inactive">
                <children>
                   <ImageView fitHeight="50.0" fitWidth="50.0" layoutX="58.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -455,7 +450,7 @@
                   </Text>
                </children>
             </AnchorPane>
-            <AnchorPane fx:id="newgamePageOn" layoutX="165.0" prefHeight="92.0" prefWidth="166.0" style="-fx-border-radius: 0 24 0 0; -fx-border-color: black; -fx-background-color: white; -fx-background-radius: 0 24 0 0; -fx-cursor: hand;">
+            <AnchorPane fx:id="newgamePageOn" layoutX="165.0" prefHeight="92.0" prefWidth="166.0" styleClass="tab-new-game-active">
                <children>
                   <ImageView fitHeight="50.0" fitWidth="50.0" layoutX="45.0" layoutY="7.0" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -479,60 +474,27 @@
                   <Image url="@res/iconTime.png" />
                </image>
             </ImageView>
-            <Text layoutX="56.0" layoutY="277.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Blitz">
+            <Text layoutX="56.0" layoutY="307.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Blitz">
                <font>
                   <Font name="Consolas Bold Italic" size="24.0" />
                </font>
             </Text>
-            <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="12.0" layoutY="251.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="12.0" layoutY="279.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@res/iconThunder.png" />
                </image>
             </ImageView>
-            <Text layoutX="59.0" layoutY="428.0" strokeType="OUTSIDE" strokeWidth="0.0" text="bullet">
+            <Text layoutX="59.0" layoutY="504.0" strokeType="OUTSIDE" strokeWidth="0.0" text="bullet">
                <font>
                   <Font name="Consolas Bold Italic" size="24.0" />
                </font>
             </Text>
-            <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="12.0" layoutY="402.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="12.0" layoutY="478.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@res/iconRocket.png" />
                </image>
             </ImageView>
-            <Text layoutX="92.0" layoutY="573.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Playing With">
-               <font>
-                  <Font name="Consolas Bold Italic" size="20.0" />
-               </font>
-            </Text>
-            <AnchorPane fx:id="botChoice" layoutX="203.0" layoutY="597.0" prefHeight="40.0" prefWidth="100.0" style="-fx-background-color: CACACA; -fx-cursor: hand; -fx-background-radius: 20; -fx-border-radius: 20;" styleClass="option">
-               <children>
-                  <Text fill="WHITE" layoutX="45.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-fill: black;" styleClass="toggled" text="Bot">
-                     <font>
-                        <Font name="Consolas Bold" size="20.0" />
-                     </font>
-                  </Text>
-                  <ImageView fitHeight="30.0" fitWidth="30.0" layoutX="5.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@res/iconOtpBot.png" />
-                     </image>
-                  </ImageView>
-               </children>
-            </AnchorPane>
-            <AnchorPane fx:id="personChoise" layoutX="17.0" layoutY="597.0" prefHeight="40.0" prefWidth="100.0" style="-fx-background-color: CACACA; -fx-cursor: hand; -fx-background-radius: 20; -fx-border-radius: 20;" styleClass="option">
-               <children>
-                  <Text fill="WHITE" layoutX="34.0" layoutY="26.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-fill: black;" text="Person">
-                     <font>
-                        <Font name="Consolas Bold" size="20.0" />
-                     </font>
-                  </Text>
-                  <ImageView fitHeight="30.0" fitWidth="30.0" layoutX="5.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@res/iconOptPer.png" />
-                     </image>
-                  </ImageView>
-               </children>
-            </AnchorPane>
-            <AnchorPane fx:id="playGame" layoutY="687.0" prefHeight="73.0" prefWidth="332.0" style="-fx-background-color: #3CAA54; -fx-background-radius: 0 0 24 24; -fx-cursor: hand;" styleClass="play-button">
+            <AnchorPane fx:id="playGame" layoutY="687.0" prefHeight="73.0" prefWidth="332.0" styleClass="play-button">
                <children>
                   <Text fill="WHITE" layoutX="126.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Play">
                      <font>
@@ -541,7 +503,7 @@
                   </Text>
                </children>
             </AnchorPane>
-            <Rectangle fx:id="opt10Mins" arcHeight="20.0" arcWidth="20.0" fill="WHITE" height="86.0" layoutX="16.0" layoutY="150.0" stroke="BLACK" strokeType="INSIDE" style="-fx-arc-height: 30; -fx-arc-width: 30; -fx-cursor: hand;" styleClass="rectangle" width="300.0" />
+            <Rectangle fx:id="opt10Mins" arcHeight="20.0" arcWidth="20.0" height="86.0" layoutX="16.0" layoutY="150.0" strokeType="INSIDE" styleClass="rectangle" width="300.0" />
             <ImageView fitHeight="46.0" fitWidth="46.0" layoutX="76.0" layoutY="168.0" pickOnBounds="true" preserveRatio="true" styleClass="button">
                <image>
                   <Image url="@res/iconOptionTime.png" />
@@ -552,24 +514,24 @@
                   <Font name="Consolas Bold" size="24.0" />
                </font>
             </Text>
-            <Rectangle fx:id="opt5Mins" arcHeight="20.0" arcWidth="20.0" fill="WHITE" height="86.0" layoutX="16.0" layoutY="299.0" stroke="BLACK" strokeType="INSIDE" style="-fx-arc-height: 30; -fx-arc-width: 30; -fx-cursor: hand;" styleClass="rectangle" width="300.0" />
-            <Rectangle fx:id="opt3Mins" arcHeight="20.0" arcWidth="20.0" fill="WHITE" height="86.0" layoutX="16.0" layoutY="442.0" stroke="BLACK" strokeType="INSIDE" style="-fx-arc-height: 30; -fx-arc-width: 30; -fx-cursor: hand;" styleClass="rectangle" width="300.0" />
-            <ImageView fitHeight="46.0" fitWidth="46.0" layoutX="69.0" layoutY="320.0" pickOnBounds="true" preserveRatio="true">
+            <Rectangle fx:id="opt5Mins" arcHeight="20.0" arcWidth="20.0" height="86.0" layoutX="16.0" layoutY="329.0" strokeType="INSIDE" styleClass="rectangle" width="300.0" />
+            <Rectangle fx:id="opt3Mins" arcHeight="20.0" arcWidth="20.0" height="86.0" layoutX="16.0" layoutY="518.0" strokeType="INSIDE" styleClass="rectangle" width="300.0" />
+            <ImageView fitHeight="46.0" fitWidth="46.0" layoutX="69.0" layoutY="538.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@res/iconOptionTime.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="46.0" fitWidth="46.0" layoutX="68.0" layoutY="462.0" pickOnBounds="true" preserveRatio="true" styleClass="button">
+            <ImageView fitHeight="46.0" fitWidth="46.0" layoutX="68.0" layoutY="350.0" pickOnBounds="true" preserveRatio="true" styleClass="button">
                <image>
                   <Image url="@res/iconOptionTime.png" />
                </image>
             </ImageView>
-            <Text layoutX="143.0" layoutY="351.0" strokeType="OUTSIDE" strokeWidth="0.0" text="5 mins">
+            <Text layoutX="143.0" layoutY="381.0" strokeType="OUTSIDE" strokeWidth="0.0" text="5 mins">
                <font>
                   <Font name="Consolas Bold" size="24.0" />
                </font>
             </Text>
-            <Text layoutX="143.0" layoutY="493.0" strokeType="OUTSIDE" strokeWidth="0.0" text="3 mins">
+            <Text layoutX="143.0" layoutY="569.0" strokeType="OUTSIDE" strokeWidth="0.0" text="3 mins">
                <font>
                   <Font name="Consolas Bold" size="24.0" />
                </font>
@@ -723,7 +685,6 @@
             </AnchorPane>
          </children>
       </AnchorPane>
-      <AnchorPane prefHeight="200.0" prefWidth="200.0" />
       <AnchorPane fx:id="boardGameChess" layoutX="39.0" layoutY="44.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="704.0" prefWidth="704.0" />
    </children>
 </Pane>
