@@ -66,6 +66,9 @@ public class ChessController {
     @FXML
     private AnchorPane whiteTurn;
 
+    @FXML
+    private AnchorPane restart;
+
     private Board board;
 
     private int selectedTimeSeconds = 600; // Default to 10 minutes (600 seconds)
@@ -95,6 +98,7 @@ public class ChessController {
         // Redraw the board initially to show the pieces
         board.draw(boardGameChess);
         updateTurnIndicators();
+        initializeRestartButton();
     }
 
     public void redraw() {
@@ -305,6 +309,14 @@ public class ChessController {
         if (whiteTimer != null) {
             whiteTimer.stop();
         }
+
+        // Reset timers
+        blackTimeSeconds = selectedTimeSeconds;
+        whiteTimeSeconds = selectedTimeSeconds;
+
+        // Update timers
+        updateTimerDisplay();
+
         // Reset the board
         board.resetBoard();
         // Redraw the board to reflect the reset state
@@ -326,6 +338,12 @@ public class ChessController {
     private void updateTurnIndicators() {
         blackTurn.setVisible(!isWhiteTurn);
         whiteTurn.setVisible(isWhiteTurn);
+    }
+
+    private void initializeRestartButton() {
+        if (restart != null) {
+            restart.setOnMouseClicked(event -> resetGame());
+        }
     }
 
     public int getSelectedTimeSeconds() {
