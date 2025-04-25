@@ -23,8 +23,8 @@ public class King extends Piece {
             if (newCol == oldCol + 2) {
                 Piece rook = board[oldRow][7];
                 if (rook instanceof Rook && !((Rook) rook).isMoved()) {
-                    if (board[oldRow][5] == null && board[oldRow][6] == null) {
-                        isMove = true;
+                    if (board[oldRow][5] == null && board[oldRow][6] == null &&
+                        !isSquareUnderAttack(board, newCol, newCol , isWhite  )) {
                         return true;
                     }
                 }
@@ -35,18 +35,18 @@ public class King extends Piece {
                 Piece rook = board[oldRow][0];
                 if (rook instanceof Rook && !((Rook) rook).isMoved()) {
                     if (board[oldRow][1] == null && board[oldRow][2] == null) {
-                        isMove = true;
                         return true;
                     }
                 }
             }
         }
 
-        // Normal steps of King
+
         if (rowDiff <= 1 && colDiff <= 1 && (rowDiff + colDiff) > 0) {
             Piece target = board[newRow][newCol];
-            if (target == null || target.isWhite != this.isWhite) {
-                isMove = true;
+            //Only check opponent piece
+            if ((target == null || target.isWhite != this.isWhite) &&
+                    !isSquareUnderAttack(board, newRow, newCol, isWhite)) { //Check whether the target position is underattack of any pieces
                 return true;
             }
         }

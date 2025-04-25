@@ -47,6 +47,21 @@ public abstract class Piece {
 
     }
 
+    //Loop through the board check all enemy piece whether you can move to that position
+    protected boolean isSquareUnderAttack(Piece[][] board, int row, int col, boolean byWhite) {
+        for (int r = 0; r < 8; r++) {
+            for (int c = 0; c < 8; c++) {
+                Piece p = board[r][c];
+                if (p != null && p.isWhite() == !byWhite) {
+                    if (p.logicMove(p.getRow(), p.getCol(), row, col, board)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
 
     public abstract boolean logicMove(int oldRow , int oldCol , int newRow , int newCol, Piece[][] board);
 

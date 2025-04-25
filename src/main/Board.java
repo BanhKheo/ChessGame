@@ -60,7 +60,6 @@ public class Board {
     {
         if( legalMove(piece , col , row)){
             int oldCol = piece.getCol();
-            int oldRow = piece.getRow();
 
             board[piece.getRow()][piece.getCol()] = null;
 
@@ -99,7 +98,17 @@ public class Board {
             piece.setCol(col);
             board[row][col] = piece;
 
+            boolean opponentInCheckmate = isCheckmate(!whiteTurn);
             whiteTurn = !whiteTurn;
+
+            if(opponentInCheckmate){
+                if(whiteTurn){
+                    System.out.println("white is lose");
+                }
+                else {
+                    System.out.println("black is lose");
+                }
+            }
         }
     }
 
@@ -111,23 +120,6 @@ public class Board {
             return false;
         }
 
-
-        // Check if there are blocking pieces (for pieces that move in straight lines)
-//        if (piece.getBlockPieces(this, row, col) != null) {
-//            return false;  // A piece is blocking the way
-//        }
-
-//        int[] blockedPos = piece.getBlockPieces(this, row, col);
-//        if (blockedPos != null) {
-//            // Check if any of the specified squares are occupied
-//            for (int i = 1; i < blockedPos.length; i++) {
-//                int c = blockedPos[i];
-//                if (board[blockedPos[0]][c] != null) {
-//                    return false; // A piece is blocking the way
-//                }
-//            }
-//        }
-
         if (isBlocked(piece, row, col)) return false;
 
         //prevent capturing own piece
@@ -136,6 +128,75 @@ public class Board {
             return false;
         }
         return true;
+    }
+
+
+    public boolean isCheckmate(boolean white) {
+        //The king is not mated
+        if (!isKingInCheck(white)) return false;
+
+        //The king is mated. Must move king or piece to avoid checkmate
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                Piece piece = board[row][col];
+                if (piece != null && piece.isWhite() == white) {
+                    List<int[]> moves = getValidMoves(piece);
+                    for (int[] move : moves) {
+                        Piece backup = board[move[1]][move[0]];
+                        int oldRow = piece.getRow();
+                        int oldCol = piece.getCol();
+
+                        board[oldRow][oldCol] = null;
+                        board[move[1]][move[0]] = piece;
+                        piece.setRow(move[1]);
+                        piece.setCol(move[0]);
+
+                        boolean stillInCheck = isKingInCheck(white);
+
+                        board[oldRow][oldCol] = piece;
+                        board[move[1]][move[0]] = backup;
+                        piece.setRow(oldRow);
+                        piece.setCol(oldCol);
+
+                        if (!stillInCheck) return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public boolean isKingInCheck(boolean isWhitePlayer) {
+        int kingRow = -1, kingCol = -1;
+
+        //find the king
+        for (int r = 0; r < 8; r++) {
+            for (int c = 0; c < 8; c++) {
+                Piece piece = board[r][c];
+                if (piece instanceof King && piece.isWhite() == isWhitePlayer) {
+                    kingRow = r;
+                    kingCol = c;
+                    break;
+                }
+            }
+        }
+
+
+        //Any piece attack the king
+        for (int r = 0; r < 8; r++) {
+            for (int c = 0; c < 8; c++) {
+                Piece enemy = board[r][c];
+                if (enemy != null && enemy.isWhite() != isWhitePlayer) {
+                    if (enemy.logicMove(enemy.getRow(), enemy.getCol(), kingRow, kingCol, board)
+                            && enemy.getBlockPieces(this, kingRow, kingCol) == null) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
 
@@ -172,33 +233,117 @@ public class Board {
 
     private List<int[]> getValidMoves(Piece piece) {
         List<int[]> moves = new ArrayList<>();
+        boolean wasMoved = false;
+
+        if (piece instanceof Pawn pawn) {
+            wasMoved = pawn.isMoved();
+        } else if (piece instanceof King king) {
+            wasMoved = king.isMoved();
+
+            // Handle castling separately
+            if (!king.isMoved() && !isKingInCheck(king.isWhite())) {
+                int row = king.getRow();
+                int col = king.getCol();
+
+                // King-side castling
+                if (canCastle(king, true)) {
+                    moves.add(new int[]{col + 2, row});
+                }
+
+                // Queen-side castling
+                if (canCastle(king, false)) {
+                    moves.add(new int[]{col - 2, row});
+                }
+            }
+        }
+
+        int originalRow = piece.getRow();
+        int originalCol = piece.getCol();
+        Piece originalTarget;
+
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
-                if (piece instanceof Pawn pawn) {
-                    boolean wasMoved = pawn.isMoved();
-                    if ( legalMove(piece, col, row) && !isBlocked(piece, row, col)) {
-                        moves.add(new int[] {col, row});
-                    }
-                    pawn.setMove(wasMoved);
-                }
+                if (!legalMove(piece, col, row)) continue;
+                if (isBlocked(piece, row, col)) continue;
 
-                else if(piece instanceof King king) {
-                    boolean wasMoved = king.isMoved();
-                    if (legalMove(piece, col, row) && !isBlocked(piece, row, col)) {
-                        moves.add(new int[] {col, row});
-                    }
-                    king.setMove(wasMoved);
-                }
+                originalTarget = board[row][col];
+                board[originalRow][originalCol] = null;
+                board[row][col] = piece;
+                piece.setRow(row);
+                piece.setCol(col);
 
-                else {
-                    if (legalMove(piece, col, row) && !isBlocked(piece, row, col)) {
-                        moves.add(new int[]{col, row}); // Fix order
+                boolean kingSafe = !isKingInCheck(piece.isWhite());
+
+                board[originalRow][originalCol] = piece;
+                board[row][col] = originalTarget;
+                piece.setRow(originalRow);
+                piece.setCol(originalCol);
+
+                if (kingSafe) {
+                    moves.add(new int[]{col, row});
+                }
+            }
+        }
+
+        if (piece instanceof Pawn pawn) {
+            pawn.setMove(wasMoved);
+        } else if (piece instanceof King king) {
+            king.setMove(wasMoved);
+        }
+
+        return moves;
+    }
+
+    private boolean canCastle(King king, boolean kingSide) {
+        int row = king.getRow();
+        int col = king.getCol();
+
+        if (kingSide) {
+            Piece rook = board[row][7];
+            if (!(rook instanceof Rook) || ((Rook) rook).isMoved()) return false;
+
+            // Check path is clear
+            for (int c = col + 1; c < 7; c++) {
+                if (board[row][c] != null) return false;
+            }
+
+            // Ensure no check on the path
+            for (int c = col; c <= col + 2; c++) {
+                if (isSquareUnderAttack(row, c, !king.isWhite())) return false;
+            }
+
+            return true;
+        } else {
+            Piece rook = board[row][0];
+            if (!(rook instanceof Rook) || ((Rook) rook).isMoved()) return false;
+
+            for (int c = col - 1; c > 0; c--) {
+                if (board[row][c] != null) return false;
+            }
+
+            for (int c = col; c >= col - 2; c--) {
+                if (isSquareUnderAttack(row, c, !king.isWhite())) return false;
+            }
+
+            return true;
+        }
+    }
+
+    private boolean isSquareUnderAttack(int row, int col, boolean byWhite) {
+        for (int r = 0; r < 8; r++) {
+            for (int c = 0; c < 8; c++) {
+                Piece piece = board[r][c];
+                if (piece != null && piece.isWhite() == byWhite) {
+                    if (piece.logicMove(piece.getRow(), piece.getCol(), row, col, board)
+                            && !isBlocked(piece, row, col)) {
+                        return true;
                     }
                 }
             }
         }
-        return moves;
+        return false;
     }
+
 
     private boolean isBlocked(Piece piece, int newRow, int newCol) {
         int[] blockedPos = piece.getBlockPieces(this, newRow, newCol);
