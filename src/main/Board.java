@@ -43,7 +43,7 @@ public class Board {
 
         if (selectedPiece == null) {
             //Check whether accuracy turn
-            if (clickedPiece != null && clickedPiece.isWhite() == whiteTurn) {
+            if (clickedPiece != null   && clickedPiece.isWhite() == whiteTurn) {
                 selectedPiece = clickedPiece;
                 validMoves = getValidMoves(selectedPiece);
             }
@@ -51,6 +51,7 @@ public class Board {
             //Move piece
             movePiece(selectedPiece, col, row);
             selectedPiece = null;
+            validMoves.clear();
         }
     }
 
@@ -112,7 +113,15 @@ public class Board {
         }
     }
 
-
+    public void resetBoard() {
+        // Clear the current board state
+        board = new Piece[8][8];
+        whiteTurn = true;
+        selectedPiece = null;
+        validMoves.clear();
+        // Reinitialize pieces
+        initializePieces();
+    }
     private boolean legalMove(Piece piece, int col, int row) {
 
         //Handle piece satisfy logic move
@@ -397,16 +406,16 @@ public class Board {
         }
 
         // Draw legal move indicators as transparent circles
-        if (selectedPiece != null) {
+        if (selectedPiece != null && !validMoves.isEmpty()) {
             for (int[] move : validMoves) {
-                if (!isBlocked(selectedPiece, move[1], move[0])) {
-                    javafx.scene.shape.Circle circle = new javafx.scene.shape.Circle();
-                    circle.setRadius(16);
-                    circle.setCenterX(move[0] * Game.GAME_TILES + Game.GAME_TILES / 2);
-                    circle.setCenterY(move[1] * Game.GAME_TILES + Game.GAME_TILES / 2);
-                    circle.setFill(javafx.scene.paint.Color.rgb(169, 169, 169, 0.6));
-                    boardGame.getChildren().add(circle);
-                }
+                javafx.scene.shape.Circle circle = new javafx.scene.shape.Circle();
+                circle.setRadius(16);
+                circle.setCenterX(move[0] * Game.GAME_TILES + Game.GAME_TILES / 2);
+                circle.setCenterY(move[1] * Game.GAME_TILES + Game.GAME_TILES / 2);
+                circle.setFill(javafx.scene.paint.Color.rgb(169, 169, 169, 0.6));
+                boardGame.getChildren().add(circle);
+                // Debug: Print circle position
+                System.out.println("Drawing circle at: (" + circle.getCenterX() + ", " + circle.getCenterY() + ")");
             }
         }
     }

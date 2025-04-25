@@ -63,7 +63,7 @@ public class King extends Piece {
         }
 
         if (newCol == oldCol - 2) {
-            return new int[]{oldRow, 1, 2};
+            return new int[]{oldRow, 1, 2, 3};
         }
         return null;
     }
