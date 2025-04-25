@@ -34,7 +34,7 @@ public class King extends Piece {
             if (newCol == oldCol - 2) {
                 Piece rook = board[oldRow][0];
                 if (rook instanceof Rook && !((Rook) rook).isMoved()) {
-                    if (board[oldRow][1] == null && board[oldRow][2] == null) {
+                    if (board[oldRow][1] == null && board[oldRow][2] == null || board[oldRow][3] == null) {
                         return true;
                     }
                 }

@@ -9,6 +9,7 @@ import static utilz.Constants.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Stack;
 
 public class Board {
 
@@ -21,7 +22,6 @@ public class Board {
     private Piece[][] board = new Piece[8][8];
 
     private boolean whiteTurn = true;
-
 
     Board(){
         initializePieces();
