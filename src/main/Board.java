@@ -8,6 +8,7 @@ import javafx.scene.layout.Pane;
 import static utilz.Constants.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 
 public class Board {
 
@@ -58,10 +59,42 @@ public class Board {
     private void movePiece(Piece piece, int col, int row)
     {
         if( legalMove(piece , col , row)){
+            int oldCol = piece.getCol();
+            int oldRow = piece.getRow();
+
             board[piece.getRow()][piece.getCol()] = null;
+
             if (piece instanceof Pawn pawn) {
                 pawn.setMove(true);
             }
+
+            if (piece instanceof King king) {
+                king.setMove(true);
+                if (col == oldCol + 2) {
+                    Piece rook = board[row][7];
+                    if (rook instanceof Rook) {
+                        board[row][7] = null;
+                        board[row][col - 1] = rook;
+                        rook.setCol(col - 1);
+                        ((Rook) rook).setMove(true);
+                    }
+                }
+
+                if (col == oldCol - 2) {
+                    Piece rook = board[row][0];
+                    if (rook instanceof Rook) {
+                        board[row][0] = null;
+                        board[row][col + 1] = rook;
+                        rook.setCol(col + 1);
+                        ((Rook) rook).setMove(true);
+                    }
+                }
+            }
+
+            if (piece instanceof Rook rook) {
+                rook.setMove(true);
+            }
+
             piece.setRow(row);
             piece.setCol(col);
             board[row][col] = piece;
@@ -74,25 +107,34 @@ public class Board {
     private boolean legalMove(Piece piece, int col, int row) {
 
         //Handle piece satisfy logic move
-        if(!piece.logicMove(piece.getRow(), piece.getCol(), row, col , board)){
+        if (!piece.logicMove(piece.getRow(), piece.getCol(), row, col, board)) {
             return false;
         }
 
 
-
         // Check if there are blocking pieces (for pieces that move in straight lines)
-        if (piece.getBlockPieces(this, row, col) != null) {
-            return false;  // A piece is blocking the way
-        }
+//        if (piece.getBlockPieces(this, row, col) != null) {
+//            return false;  // A piece is blocking the way
+//        }
 
+//        int[] blockedPos = piece.getBlockPieces(this, row, col);
+//        if (blockedPos != null) {
+//            // Check if any of the specified squares are occupied
+//            for (int i = 1; i < blockedPos.length; i++) {
+//                int c = blockedPos[i];
+//                if (board[blockedPos[0]][c] != null) {
+//                    return false; // A piece is blocking the way
+//                }
+//            }
+//        }
 
+        if (isBlocked(piece, row, col)) return false;
 
         //prevent capturing own piece
         Piece targetPiece = board[row][col];
         if (targetPiece != null && targetPiece.isWhite() == piece.isWhite()) {
             return false;
         }
-
         return true;
     }
 
@@ -139,6 +181,15 @@ public class Board {
                     }
                     pawn.setMove(wasMoved);
                 }
+
+                else if(piece instanceof King king) {
+                    boolean wasMoved = king.isMoved();
+                    if (legalMove(piece, col, row) && !isBlocked(piece, row, col)) {
+                        moves.add(new int[] {col, row});
+                    }
+                    king.setMove(wasMoved);
+                }
+
                 else {
                     if (legalMove(piece, col, row) && !isBlocked(piece, row, col)) {
                         moves.add(new int[]{col, row}); // Fix order
@@ -151,7 +202,37 @@ public class Board {
 
     private boolean isBlocked(Piece piece, int newRow, int newCol) {
         int[] blockedPos = piece.getBlockPieces(this, newRow, newCol);
-        return blockedPos != null;  // If there's a blocking piece, return true
+
+        if (blockedPos != null) {
+            for (int i = 1; i < blockedPos.length; i++) {
+                int col = blockedPos[i];
+                if (board[blockedPos[0]][col] != null) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        if (piece instanceof Rook || piece instanceof Bishop || piece instanceof Queen) {
+            int oldRow = piece.getRow();
+            int oldCol = piece.getCol();
+
+            int rowStep = Integer.compare(newRow, oldRow);
+            int colStep = Integer.compare(newCol, oldCol);
+
+            int r = oldRow + rowStep;
+            int c = oldCol + colStep;
+
+            while (r != newRow || c != newCol) {
+                if (board[r][c] != null) {
+                    return true;
+                }
+                r += rowStep;
+                c += colStep;
+            }
+        }
+        return false;
+//        return blockedPos != null;  // If there's a blocking piece, return true
     }
 
     public Piece getPieceAt( int row , int col){
@@ -184,10 +265,6 @@ public class Board {
             }
         }
     }
-
-
-
-
 
     public Piece getSelectedPiece() {
         return selectedPiece;
