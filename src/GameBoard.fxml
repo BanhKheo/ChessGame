@@ -239,24 +239,6 @@
             <AnchorPane layoutX="616.0" layoutY="440.0" prefHeight="87.5" prefWidth="87.5" style="-fx-background-color: EBECD0;" />
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="blackPieceWin" layoutX="377.0" layoutY="22.0" prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: #9EDB61; -fx-background-radius: 20;" visible="false">
-         <children>
-            <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@res/Crown.png" />
-               </image>
-            </ImageView>
-         </children>
-      </AnchorPane>
-      <AnchorPane fx:id="whitePieceLoose" layoutX="376.0" layoutY="740.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: FD0E0E; -fx-background-radius: 20;" visible="false">
-         <children>
-            <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@res/FlagLoose.png" />
-               </image>
-            </ImageView>
-         </children>
-      </AnchorPane>
       <AnchorPane fx:id="gameStatusPage" layoutX="803.0" layoutY="22.0" prefHeight="760.0" prefWidth="332.0" style="-fx-background-color: FFFFFF; -fx-background-radius: 24;" stylesheets="@stylesheet.css">
          <children>
             <AnchorPane fx:id="StatusPageOn" prefHeight="92.0" prefWidth="166.0" styleClass="tab-active">
@@ -298,18 +280,18 @@
                   <Font name="Consolas" size="20.0" />
                </font>
             </Text>
-            <Text fx:id="blackTextTurn" layoutX="197.0" layoutY="222.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Black">
+            <Text fx:id="blackTextTurn" layoutX="197.0" layoutY="222.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Black" visible="false">
                <font>
                   <Font name="Consolas Bold" size="20.0" />
                </font>
             </Text>
-            <AnchorPane fx:id="blackTurn" layoutX="268.0" layoutY="206.0" prefHeight="22.0" prefWidth="24.0" style="-fx-background-radius: 20; -fx-background-color: black;" />
-            <Text fx:id="whiteTextTurn" layoutX="197.0" layoutY="222.0" strokeType="OUTSIDE" strokeWidth="0.0" text="White" visible="false">
+            <AnchorPane fx:id="blackTurn" layoutX="268.0" layoutY="206.0" prefHeight="22.0" prefWidth="24.0" style="-fx-background-radius: 20; -fx-background-color: black;" visible="false" />
+            <Text fx:id="whiteTextTurn" layoutX="197.0" layoutY="222.0" strokeType="OUTSIDE" strokeWidth="0.0" text="White">
                <font>
                   <Font name="Consolas Bold" size="20.0" />
                </font>
             </Text>
-            <AnchorPane fx:id="whiteTurn" layoutX="268.0" layoutY="206.0" prefHeight="22.0" prefWidth="24.0" style="-fx-background-radius: 20; -fx-border-color: black; -fx-border-radius: 20 20 20 20; -fx-background-color: white;" visible="false" />
+            <AnchorPane fx:id="whiteTurn" layoutX="268.0" layoutY="206.0" prefHeight="22.0" prefWidth="24.0" style="-fx-background-radius: 20; -fx-border-color: black; -fx-border-radius: 20 20 20 20; -fx-background-color: white;" />
             <AnchorPane layoutX="39.0" layoutY="234.0" prefHeight="45.0" prefWidth="225.0" style="-fx-background-color: B7FDB1; -fx-background-radius: 5;">
                <children>
                   <Text fill="#00b40c" layoutX="6.0" layoutY="28.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Game in progess">
@@ -416,24 +398,6 @@
             </AnchorPane>
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="blackPieceLoose" layoutX="377.0" layoutY="22.0" prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: FD0E0E; -fx-background-radius: 20;">
-         <children>
-            <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@res/FlagLoose.png" />
-               </image>
-            </ImageView>
-         </children>
-      </AnchorPane>
-      <AnchorPane fx:id="whitePieceWin" cache="true" cacheHint="SPEED" layoutX="376.0" layoutY="740.0" prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: #9EDB61; -fx-background-radius: 20;">
-         <children>
-            <ImageView fitHeight="35.0" fitWidth="35.0" layoutY="-2.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@res/Crown.png" />
-               </image>
-            </ImageView>
-         </children>
-      </AnchorPane>
       <AnchorPane fx:id="newGamePage" layoutX="803.0" layoutY="23.0" prefHeight="760.0" prefWidth="332.0" style="-fx-background-color: FFFFFF; -fx-background-radius: 24;" stylesheets="@stylesheet.css" visible="false">
          <children>
             <AnchorPane fx:id="StatusPageOff" prefHeight="92.0" prefWidth="166.0" styleClass="tab-inactive">
@@ -538,7 +502,40 @@
             </Text>
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="notificationWinPage" layoutX="275.0" layoutY="127.0" prefHeight="595.0" prefWidth="250.0" style="-fx-background-color: white; -fx-background-radius: 24;" stylesheets="@stylesheet.css" visible="false">
+      <AnchorPane fx:id="restartGameNotification" layoutX="233.0" layoutY="330.0" prefHeight="120.0" prefWidth="440.0" style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: black; -fx-border-radius: 8;" visible="false">
+         <children>
+            <Text layoutX="16.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Are you sure?">
+               <font>
+                  <Font name="Serif Bold" size="20.0" />
+               </font>
+            </Text>
+            <Text layoutX="18.0" layoutY="58.0" strokeType="OUTSIDE" strokeWidth="0.0" text="This will reset the current game. All move will be lost.">
+               <font>
+                  <Font name="Consolas" size="12.0" />
+               </font>
+            </Text>
+            <AnchorPane fx:id="cancelRestart" layoutX="296.0" layoutY="73.0" prefHeight="30.0" prefWidth="60.0" style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: DCDCDC; -fx-border-radius: 8; -fx-cursor: hand;">
+               <children>
+                  <Text layoutX="12.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Cancel">
+                     <font>
+                        <Font name="Consolas Bold" size="12.0" />
+                     </font>
+                  </Text>
+               </children>
+            </AnchorPane>
+            <AnchorPane fx:id="acceptRestartGame" layoutX="366.0" layoutY="73.0" prefHeight="30.0" prefWidth="60.0" style="-fx-background-color: black; -fx-background-radius: 8; -fx-border-radius: 8; -fx-cursor: hand;">
+               <children>
+                  <Text fill="WHITE" layoutX="9.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Restart">
+                     <font>
+                        <Font name="Consolas Bold" size="12.0" />
+                     </font>
+                  </Text>
+               </children>
+            </AnchorPane>
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="boardGameChess" layoutX="39.0" layoutY="44.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="704.0" prefWidth="704.0" />
+      <AnchorPane fx:id="notificationWinPage" layoutX="260.0" layoutY="100.0" prefHeight="595.0" prefWidth="250.0" style="-fx-background-color: white; -fx-background-radius: 24;" stylesheets="@stylesheet.css">
          <children>
             <AnchorPane prefHeight="150.0" prefWidth="250.0" style="-fx-background-color: #2B2A2A; -fx-background-radius: 24 24 0 0;">
                <children>
@@ -597,7 +594,7 @@
                   <DropShadow />
                </effect>
             </AnchorPane>
-            <AnchorPane fx:id="rematchGame" layoutX="25.0" layoutY="210.0" prefHeight="60.0" prefWidth="200.0" style="-fx-background-color: #739552; -fx-background-radius: 24;" styleClass="option">
+            <AnchorPane fx:id="rematchGame" layoutX="25.0" layoutY="231.0" prefHeight="60.0" prefWidth="200.0" style="-fx-background-color: #739552; -fx-background-radius: 24;" styleClass="option">
                <children>
                   <Text fill="WHITE" layoutX="48.0" layoutY="38.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Rematch">
                      <font>
@@ -615,76 +612,43 @@
                </image>
             </ImageView>
             <AnchorPane layoutY="547.0" prefHeight="50.0" prefWidth="250.0" style="-fx-background-color: BA5959; -fx-background-radius: 0 0 24 24;" />
-            <AnchorPane fx:id="rematch10Mins" layoutX="70.0" layoutY="301.0" prefHeight="33.0" prefWidth="108.0" style="-fx-background-color: D1D1D1;">
-               <effect>
-                  <DropShadow blurType="ONE_PASS_BOX" radius="8.245000000000001" width="13.98" />
-               </effect>
-               <children>
-                  <Text layoutX="19.0" layoutY="21.0" strokeType="OUTSIDE" strokeWidth="0.0" text="10 mins">
-                     <font>
-                        <Font name="Consolas Bold" size="18.0" />
-                     </font>
-                  </Text>
-                  <AnchorPane fx:id="rematch5Mins" layoutX="1.0" layoutY="1.0" prefHeight="33.0" prefWidth="108.0" style="-fx-background-color: D1D1D1;" visible="false">
-                     <effect>
-                        <DropShadow blurType="ONE_PASS_BOX" />
-                     </effect>
-                     <children>
-                        <Text layoutX="24.0" layoutY="23.0" strokeType="OUTSIDE" strokeWidth="0.0" text="5 mins">
-                           <font>
-                              <Font name="Consolas Bold" size="18.0" />
-                           </font>
-                        </Text>
-                     </children>
-                  </AnchorPane>
-                  <AnchorPane fx:id="rematch3Mins" layoutX="1.0" prefHeight="33.0" prefWidth="108.0" style="-fx-background-color: D1D1D1;" visible="false">
-                     <effect>
-                        <DropShadow blurType="ONE_PASS_BOX" />
-                     </effect>
-                     <children>
-                        <Text layoutX="19.0" layoutY="21.0" strokeType="OUTSIDE" strokeWidth="0.0" text="3 mins">
-                           <font>
-                              <Font name="Consolas Bold" size="18.0" />
-                           </font>
-                        </Text>
-                     </children>
-                  </AnchorPane>
-               </children>
-            </AnchorPane>
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="restartGameNotification" layoutX="233.0" layoutY="330.0" prefHeight="120.0" prefWidth="440.0" style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: black; -fx-border-radius: 8;" visible="false">
+      <AnchorPane fx:id="blackPieceWin" layoutX="377.0" layoutY="22.0" prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: #9EDB61; -fx-background-radius: 20;" visible="false">
          <children>
-            <Text layoutX="16.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Are you sure?">
-               <font>
-                  <Font name="Serif Bold" size="20.0" />
-               </font>
-            </Text>
-            <Text layoutX="18.0" layoutY="58.0" strokeType="OUTSIDE" strokeWidth="0.0" text="This will reset the current game. All move will be lost.">
-               <font>
-                  <Font name="Consolas" size="12.0" />
-               </font>
-            </Text>
-            <AnchorPane fx:id="cancelRestart" layoutX="296.0" layoutY="73.0" prefHeight="30.0" prefWidth="60.0" style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: DCDCDC; -fx-border-radius: 8; -fx-cursor: hand;">
-               <children>
-                  <Text layoutX="12.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Cancel">
-                     <font>
-                        <Font name="Consolas Bold" size="12.0" />
-                     </font>
-                  </Text>
-               </children>
-            </AnchorPane>
-            <AnchorPane fx:id="acceptRestartGame" layoutX="366.0" layoutY="73.0" prefHeight="30.0" prefWidth="60.0" style="-fx-background-color: black; -fx-background-radius: 8; -fx-border-radius: 8; -fx-cursor: hand;">
-               <children>
-                  <Text fill="WHITE" layoutX="9.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Restart">
-                     <font>
-                        <Font name="Consolas Bold" size="12.0" />
-                     </font>
-                  </Text>
-               </children>
-            </AnchorPane>
+            <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@res/Crown.png" />
+               </image>
+            </ImageView>
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="boardGameChess" layoutX="39.0" layoutY="44.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="704.0" prefWidth="704.0" />
+      <AnchorPane fx:id="blackPieceLoose" layoutX="377.0" layoutY="22.0" prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: FD0E0E; -fx-background-radius: 20;">
+         <children>
+            <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@res/FlagLoose.png" />
+               </image>
+            </ImageView>
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="whitePieceWin" cache="true" cacheHint="SPEED" layoutX="376.0" layoutY="740.0" prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: #9EDB61; -fx-background-radius: 20;">
+         <children>
+            <ImageView fitHeight="35.0" fitWidth="35.0" layoutY="-2.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@res/Crown.png" />
+               </image>
+            </ImageView>
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="whitePieceLoose" layoutX="376.0" layoutY="740.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: FD0E0E; -fx-background-radius: 20;" visible="false">
+         <children>
+            <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@res/FlagLoose.png" />
+               </image>
+            </ImageView>
+         </children>
+      </AnchorPane>
    </children>
 </Pane>
