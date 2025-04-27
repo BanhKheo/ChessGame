@@ -48,7 +48,7 @@
 /* Game mode buttons (Rapid, Blitz, Bullet) */
 .rectangle {
     -fx-background-radius: 20;
-    -fx-fill: #D1D1D1;
+    -fx-fill: #FFFFFF;
     -fx-stroke: transparent;
     -fx-stroke-width: 1;
 }
@@ -59,20 +59,22 @@
 
 /* Selected state for game mode buttons */
 .rectangle-selected {
-    -fx-fill: #FFFFFF;
+    -fx-fill: #D1D1D1;
 }
 
 /* Styles for Game Status and New Game tabs */
 .tab-active {
     -fx-border-radius: 24 0 0 0;
     -fx-border-color: black;
+    -fx-background-color: #DBDBDB;
+    -fx-background-radius: 24 0 0 0;
     -fx-cursor: hand;
 }
 
 .tab-inactive {
     -fx-border-radius: 24 0 0 0;
     -fx-border-color: black;
-    -fx-background-color: #DBDBDB;
+    -fx-background-color: white;
     -fx-background-radius: 24 0 0 0;
     -fx-cursor: hand;
 }
@@ -81,7 +83,7 @@
 .tab-new-game-active {
     -fx-border-radius: 0 24 0 0;
     -fx-border-color: black;
-    -fx-background-color: white;
+    -fx-background-color: #DBDBDB;
     -fx-background-radius: 0 24 0 0;
     -fx-cursor: hand;
 }
@@ -89,7 +91,7 @@
 .tab-new-game-inactive {
     -fx-border-radius: 0 24 0 0;
     -fx-border-color: black;
-    -fx-background-color: #DBDBDB;
+    -fx-background-color: white;
     -fx-background-radius: 0 24 0 0;
     -fx-cursor: hand;
 }
@@ -127,3 +129,25 @@
     -fx-background-color: #069525;
     -fx-border-color: transparent;
 }
+
+
+.black-turn {
+     -fx-background-radius: 20;
+     -fx-background-color: black;
+ }
+ .white-turn {
+     -fx-background-radius: 20;
+     -fx-border-color: black;
+     -fx-border-radius: 20 20 20 20;
+     -fx-background-color: white;
+ }
+ .black-turn-inactive {
+     -fx-background-radius: 20;
+     -fx-background-color: #666666;
+ }
+ .white-turn-inactive {
+     -fx-background-radius: 20;
+     -fx-border-color: black;
+     -fx-border-radius: 20 20 20 20;
+     -fx-background-color: #999999;
+ }
