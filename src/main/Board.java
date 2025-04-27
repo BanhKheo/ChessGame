@@ -9,7 +9,6 @@ import static utilz.Constants.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
-import java.util.Stack;
 
 public class Board {
 
@@ -23,11 +22,15 @@ public class Board {
 
     private boolean whiteTurn = true;
 
+    private ChessController chessController;
+
     Board(){
         initializePieces();
     }
 
-
+    public void setChessController(ChessController controller) {
+        this.chessController = controller;
+    }
 
 
     //Handle the selected pieces when on click
@@ -103,11 +106,10 @@ public class Board {
             whiteTurn = !whiteTurn;
 
             if(opponentInCheckmate){
-                if(whiteTurn){
-                    System.out.println("white is lose");
-                }
-                else {
-                    System.out.println("black is lose");
+                if (chessController != null) {
+                    chessController.handleCheckmate(whiteTurn);
+                } else {
+                    System.out.println("Cannot notify checkmate");
                 }
             }
         }

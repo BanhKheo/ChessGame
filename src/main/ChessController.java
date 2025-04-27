@@ -3,12 +3,13 @@ package main;
 import javafx.animation.FadeTransition;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.Scene;
+import javafx.scene.Node;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,74 +17,52 @@ import java.util.List;
 public class ChessController {
 
     @FXML
-    private Text player1Name;
+    private Text player1Name, player2Name, botName;
 
     @FXML
-    private Text player2Name;
+    private AnchorPane gameStatusPage, newGamePage;
 
     @FXML
-    private Text botName;
+    private AnchorPane StatusPageOn, StatusPageOff, newGamePageOff, newgamePageOn;
 
     @FXML
-    private AnchorPane gameStatusPage;
+    private Rectangle opt10Mins, opt5Mins, opt3Mins;
 
     @FXML
-    private AnchorPane newGamePage;
+    private AnchorPane playGame, surrender;
 
     @FXML
-    private AnchorPane StatusPageOn;
+    private Text blackTime, whiteTime;
 
     @FXML
-    private AnchorPane StatusPageOff;
+    private AnchorPane blackTurn, whiteTurn;
 
     @FXML
-    private AnchorPane newGamePageOff;
+    private Text blackTextTurn, whiteTextTurn;
 
     @FXML
-    private AnchorPane newgamePageOn;
+    private AnchorPane notificationWinPage;
 
     @FXML
-    private Rectangle opt10Mins;
+    private Text winner1, winner2, botWin;
 
     @FXML
-    private Rectangle opt5Mins;
+    private AnchorPane blackPieceWin, blackPieceLoose, whitePieceWin, whitePieceLoose;
 
     @FXML
-    private Rectangle opt3Mins;
-
-    @FXML
-    private AnchorPane playGame;
-
-    @FXML
-    private Text blackTime;
-
-    @FXML
-    private Text whiteTime;
-
-    @FXML
-    private AnchorPane blackTurn;
-
-    @FXML
-    private AnchorPane whiteTurn;
-
-    @FXML
-    private AnchorPane restart;
-
-    private Board board;
-
-    private int selectedTimeSeconds = 600; // Default to 10 minutes (600 seconds)
-
-    private Timeline blackTimer;
-    private Timeline whiteTimer;
-    private int blackTimeSeconds;
-    private int whiteTimeSeconds;
-    private boolean isWhiteTurn = true; // Start with white's turn
-    private boolean isFirstMove = true;
-
-    private Game game; // Reference to the Game instance
+    private Text checkMateBlack, checkMateWhite;
 
     @FXML
     private AnchorPane boardGameChess;
+
+    private Board board;
+    private int selectedTimeSeconds = 600; // Default to 10 minutes
+    private Timeline blackTimer, whiteTimer;
+    private int blackTimeSeconds, whiteTimeSeconds;
+    private boolean isFirstMove = true;
+    private Game game;
+    private boolean gameEnded = false;
+    private double dragOffsetX, dragOffsetY; // For dragging notificationWinPage
 
     public void setGame(Game game) {
         this.game = game;
@@ -91,62 +70,73 @@ public class ChessController {
 
     public void setBoard(Board board) {
         this.board = board;
+        board.setChessController(this);
         initializeTabTransitions();
         initializeTimeOptions();
         initializePlayGame();
         initializeBoardInteraction();
-        // Redraw the board initially to show the pieces
+        initializeNotificationWinPage();
+        initializeSurrenderButton();
         board.draw(boardGameChess);
         updateTurnIndicators();
-        initializeRestartButton();
+
+        Scene scene = boardGameChess.getScene();
+        if (scene != null) {
+            scene.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+                if (notificationWinPage.isVisible() && !isChildOf((Node) event.getTarget(), notificationWinPage)) {
+                    event.consume();
+                    System.out.println("Click outside notificationWinPage blocked");
+                }
+            });
+        } else {
+            System.out.println("Scene not available in setBoard");
+        }
+    }
+
+    private boolean isChildOf(Node node, Node parent) {
+        while (node != null) {
+            if (node == parent) return true;
+            node = node.getParent();
+        }
+        return false;
     }
 
     public void redraw() {
-        // Redraw the board
         board.draw(boardGameChess);
-        // Update timers based on the current turn (synchronized with Board)
-        if (board.isWhiteTurn()) {
-            blackTimer.pause();
-            whiteTimer.play();
-        } else {
-            whiteTimer.pause();
-            blackTimer.play();
+        if (!gameEnded) {
+            if (board.isWhiteTurn()) {
+                if (blackTimer != null) blackTimer.pause();
+                if (whiteTimer != null) whiteTimer.play();
+            } else {
+                if (whiteTimer != null) whiteTimer.pause();
+                if (blackTimer != null) blackTimer.play();
+            }
         }
         updateTurnIndicators();
     }
 
     public void setPlayerNames(String player1, String player2, boolean isPlayingWithBot) {
-        if (player1Name != null) {
-            player1Name.setText(player1);
-        }
-        if (isPlayingWithBot) {
-            player2Name.setVisible(false);
-            botName.setVisible(true);
-            botName.setText(player2);
-        } else {
-            player2Name.setVisible(true);
-            botName.setVisible(false);
-            player2Name.setText(player2);
-        }
+        if (player1Name != null) player1Name.setText(player1);
+        player2Name.setVisible(!isPlayingWithBot);
+        botName.setVisible(isPlayingWithBot);
+        (isPlayingWithBot ? botName : player2Name).setText(player2);
     }
 
     public void setTimer(int timeSeconds) {
-        this.selectedTimeSeconds = timeSeconds;
-        blackTimeSeconds = timeSeconds;
-        whiteTimeSeconds = timeSeconds;
+        selectedTimeSeconds = timeSeconds;
+        blackTimeSeconds = whiteTimeSeconds = timeSeconds;
         updateTimerDisplay();
         initializeTimers();
     }
 
     private void initializeTabTransitions() {
-        gameStatusPage.setVisible(false);
-        newGamePage.setVisible(true);
+        gameStatusPage.setVisible(true);
+        newGamePage.setVisible(false);
+        updateTabStyles(true);
 
         StatusPageOn.setOnMouseClicked(event -> {
             if (!gameStatusPage.isVisible()) {
                 transitionPages(newGamePage, gameStatusPage);
-                updateTabStyles(true);
-            } else {
                 updateTabStyles(true);
             }
         });
@@ -155,16 +145,12 @@ public class ChessController {
             if (!gameStatusPage.isVisible()) {
                 transitionPages(newGamePage, gameStatusPage);
                 updateTabStyles(true);
-            } else {
-                updateTabStyles(true);
             }
         });
 
         newGamePageOff.setOnMouseClicked(event -> {
             if (!newGamePage.isVisible()) {
                 transitionPages(gameStatusPage, newGamePage);
-                updateTabStyles(false);
-            } else {
                 updateTabStyles(false);
             }
         });
@@ -173,20 +159,18 @@ public class ChessController {
             if (!newGamePage.isVisible()) {
                 transitionPages(gameStatusPage, newGamePage);
                 updateTabStyles(false);
-            } else {
-                updateTabStyles(false);
             }
         });
     }
 
     private void transitionPages(AnchorPane fromPage, AnchorPane toPage) {
-        FadeTransition fadeOut = new FadeTransition(Duration.millis(1), fromPage);
+        FadeTransition fadeOut = new FadeTransition(Duration.millis(3), fromPage);
         fadeOut.setFromValue(1.0);
         fadeOut.setToValue(0.0);
         fadeOut.setOnFinished(event -> {
             fromPage.setVisible(false);
             toPage.setVisible(true);
-            FadeTransition fadeIn = new FadeTransition(Duration.millis(1), toPage);
+            FadeTransition fadeIn = new FadeTransition(Duration.millis(3), toPage);
             fadeIn.setFromValue(0.0);
             fadeIn.setToValue(1.0);
             fadeIn.play();
@@ -195,31 +179,15 @@ public class ChessController {
     }
 
     private void updateTabStyles(boolean isGameStatusActive) {
-        if (isGameStatusActive) {
-            StatusPageOn.getStyleClass().removeAll("tab-active", "tab-inactive");
-            StatusPageOn.getStyleClass().add("tab-inactive");
+        updateStyleClass(StatusPageOn, isGameStatusActive, "tab-active", "tab-inactive");
+        updateStyleClass(StatusPageOff, isGameStatusActive, "tab-active", "tab-inactive");
+        updateStyleClass(newGamePageOff, !isGameStatusActive, "tab-new-game-active", "tab-new-game-inactive");
+        updateStyleClass(newgamePageOn, !isGameStatusActive, "tab-new-game-active", "tab-new-game-inactive");
+    }
 
-            StatusPageOff.getStyleClass().removeAll("tab-active", "tab-inactive");
-            StatusPageOff.getStyleClass().add("tab-inactive");
-
-            newGamePageOff.getStyleClass().removeAll("tab-new-game-active", "tab-new-game-inactive");
-            newGamePageOff.getStyleClass().add("tab-new-game-active");
-
-            newgamePageOn.getStyleClass().removeAll("tab-new-game-active", "tab-new-game-inactive");
-            newgamePageOn.getStyleClass().add("tab-new-game-active");
-        } else {
-            StatusPageOff.getStyleClass().removeAll("tab-active", "tab-inactive");
-            StatusPageOff.getStyleClass().add("tab-active");
-
-            StatusPageOn.getStyleClass().removeAll("tab-active", "tab-inactive");
-            StatusPageOn.getStyleClass().add("tab-active");
-
-            newGamePageOff.getStyleClass().removeAll("tab-new-game-active", "tab-new-game-inactive");
-            newGamePageOff.getStyleClass().add("tab-new-game-inactive");
-
-            newgamePageOn.getStyleClass().removeAll("tab-new-game-active", "tab-new-game-inactive");
-            newgamePageOn.getStyleClass().add("tab-new-game-inactive");
-        }
+    private void updateStyleClass(Node node, boolean condition, String activeClass, String inactiveClass) {
+        node.getStyleClass().removeAll(activeClass, inactiveClass);
+        node.getStyleClass().add(condition ? activeClass : inactiveClass);
     }
 
     private void initializeTimeOptions() {
@@ -230,44 +198,29 @@ public class ChessController {
     private void handleTimeOptionClick(Rectangle clickedOption, List<Rectangle> timeOptions) {
         timeOptions.forEach(option -> option.getStyleClass().remove("rectangle-selected"));
         clickedOption.getStyleClass().add("rectangle-selected");
-
-        if (clickedOption == opt10Mins) {
-            selectedTimeSeconds = 600;
-        } else if (clickedOption == opt5Mins) {
-            selectedTimeSeconds = 300;
-        } else if (clickedOption == opt3Mins) {
-            selectedTimeSeconds = 180;
-        }
+        selectedTimeSeconds = clickedOption == opt10Mins ? 600 : clickedOption == opt5Mins ? 300 : 180;
     }
 
     private void initializePlayGame() {
-        playGame.setOnMouseClicked(event -> {
-            if (game == null) {
-                throw new IllegalStateException("Game instance is not set in ChessController");
-            }
-            game.switchToMainScene();
-        });
+        if (playGame != null) {
+            playGame.setOnMouseClicked(event -> {
+                if (game == null) throw new IllegalStateException("Game instance is not set in ChessController");
+                game.switchToMainScene();
+            });
+        }
     }
 
     private void initializeBoardInteraction() {
         boardGameChess.setOnMouseClicked(event -> {
+            if (gameEnded) return;
             int x = (int) event.getX();
             int y = (int) event.getY();
             boolean wasWhiteTurn = board.isWhiteTurn();
             board.handleSelectedPiece(x, y);
-            // Redraw after selecting a piece to show valid moves
-            if (board.getSelectedPiece() != null && wasWhiteTurn == board.isWhiteTurn()) {
-                redraw();
-            }
-            // Check if the turn changed (i.e., a valid move was made)
-            if (wasWhiteTurn != board.isWhiteTurn()) {
-                if (isFirstMove) {
-                    // Start the timer for the first move
-                    if (board.isWhiteTurn()) {
-                        whiteTimer.play();
-                    } else {
-                        blackTimer.play();
-                    }
+            if (board.getSelectedPiece() != null || wasWhiteTurn != board.isWhiteTurn()) {
+                if (isFirstMove && wasWhiteTurn != board.isWhiteTurn()) {
+                    if (board.isWhiteTurn()) whiteTimer.play();
+                    else blackTimer.play();
                     isFirstMove = false;
                 }
                 redraw();
@@ -281,8 +234,8 @@ public class ChessController {
                 blackTimeSeconds--;
                 updateTimerDisplay();
             } else {
-                blackTimer.stop();
-                // Handle game over (black ran out of time)
+                stopTimers();
+                endGame(true, "White wins by timeout! Black ran out of time.");
             }
         }));
         blackTimer.setCycleCount(Timeline.INDEFINITE);
@@ -292,34 +245,152 @@ public class ChessController {
                 whiteTimeSeconds--;
                 updateTimerDisplay();
             } else {
-                whiteTimer.stop();
-                // Handle game over (white ran out of time)
+                stopTimers();
+                endGame(false, "Black wins by timeout! White ran out of time.");
             }
         }));
         whiteTimer.setCycleCount(Timeline.INDEFINITE);
+
+        System.out.println("Timers initialized: blackTimer=" + (blackTimer != null) + ", whiteTimer=" + (whiteTimer != null));
     }
 
-    // Add this method to the existing ChessController.java
-    public void resetGame() {
-        isFirstMove = true;
-        // Stop timers
+    private void initializeNotificationWinPage() {
+        AnchorPane turnOffWinPage = (AnchorPane) notificationWinPage.lookup("#turnOffWinPage");
+        if (turnOffWinPage != null) {
+            turnOffWinPage.setOnMouseClicked(event -> {
+                notificationWinPage.setVisible(false);
+                game.switchToMainScene();
+                System.out.println("turnOffWinPage clicked, returning to main scene");
+            });
+        }
+
+        AnchorPane rematchGame = (AnchorPane) notificationWinPage.lookup("#rematchGame");
+        if (rematchGame != null) {
+            rematchGame.setOnMouseClicked(event -> {
+                resetGame();
+                notificationWinPage.setVisible(false);
+                System.out.println("rematchGame clicked, game reset and notificationWinPage hidden");
+            });
+        } else {
+            System.out.println("rematchGame not found in notificationWinPage");
+        }
+
+        notificationWinPage.setOnMousePressed(event -> {
+            dragOffsetX = event.getX();
+            dragOffsetY = event.getY();
+            System.out.println("Mouse pressed on notificationWinPage at: " + dragOffsetX + ", " + dragOffsetY);
+            event.consume(); // Prevent click from propagating
+        });
+
+        notificationWinPage.setOnMouseDragged(event -> {
+            Scene scene = notificationWinPage.getScene();
+            if (scene == null) {
+                System.out.println("Scene not available during drag");
+                return;
+            }
+
+            // Calculate new position
+            double newX = event.getSceneX() - dragOffsetX;
+            double newY = event.getSceneY() - dragOffsetY;
+
+            // Get scene bounds
+            double sceneWidth = scene.getWidth();
+            double sceneHeight = scene.getHeight();
+            double paneWidth = notificationWinPage.getWidth();
+            double paneHeight = notificationWinPage.getHeight();
+
+            // Restrict to scene bounds
+            newX = Math.max(0, Math.min(newX, sceneWidth - paneWidth));
+            newY = Math.max(0, Math.min(newY, sceneHeight - paneHeight));
+
+            // Update position
+            notificationWinPage.setLayoutX(newX);
+            notificationWinPage.setLayoutY(newY);
+            System.out.println("Dragging notificationWinPage to: " + newX + ", " + newY);
+            event.consume(); // Prevent drag from propagating
+        });
+    }
+
+    private void initializeSurrenderButton() {
+        if (surrender != null) {
+            surrender.setOnMouseClicked(event -> {
+                if (!gameEnded) surrender();
+            });
+        } else {
+            System.out.println("Surrender button not found in FXML");
+        }
+    }
+
+    public void surrender() {
+        boolean isWhiteSurrendering = board.isWhiteTurn();
+        String message = isWhiteSurrendering ? "White surrenders! Black wins." : "Black surrenders! White wins.";
+        endGame(!isWhiteSurrendering, message);
+    }
+
+    public void handleCheckmate(boolean isWhiteTurn) {
+        String message = isWhiteTurn ? "Black wins! White is checkmated." : "White wins! Black is checkmated.";
+        endGame(!isWhiteTurn, message);
+    }
+
+    private void endGame(boolean whiteWins, String message) {
+        stopTimers();
+        gameEnded = true;
+
+        boolean isPlayingWithBot = botName.isVisible();
+        String winnerName = whiteWins ? player1Name.getText() : isPlayingWithBot ? botName.getText() : player2Name.getText();
+
+        // Update piece visuals
+        whitePieceWin.setVisible(whiteWins);
+        blackPieceLoose.setVisible(whiteWins);
+        blackPieceWin.setVisible(!whiteWins);
+        whitePieceLoose.setVisible(!whiteWins);
+        checkMateWhite.setVisible(whiteWins);
+        checkMateBlack.setVisible(!whiteWins);
+
+        // Update winner text
+        winner1.setVisible(false);
+        winner2.setVisible(false);
+        botWin.setVisible(false);
+        if (whiteWins) {
+            winner1.setText(winnerName);
+            winner1.setVisible(true);
+        } else if (isPlayingWithBot) {
+            botWin.setText(winnerName);
+            botWin.setVisible(true);
+        } else {
+            winner2.setText(winnerName);
+            winner2.setVisible(true);
+        }
+
+        notificationWinPage.setVisible(true);
+        System.out.println(message + " Winner: " + winnerName + ", isPlayingWithBot: " + isPlayingWithBot);
+    }
+
+    private void stopTimers() {
         if (blackTimer != null) {
             blackTimer.stop();
+            System.out.println("blackTimer stopped");
         }
         if (whiteTimer != null) {
             whiteTimer.stop();
+            System.out.println("whiteTimer stopped");
         }
+    }
 
-        // Reset timers
-        blackTimeSeconds = selectedTimeSeconds;
-        whiteTimeSeconds = selectedTimeSeconds;
-
-        // Update timers
-        updateTimerDisplay();
-
-        // Reset the board
+    public void resetGame() {
+        isFirstMove = true;
+        stopTimers();
         board.resetBoard();
-        // Redraw the board to reflect the reset state
+        blackTimeSeconds = whiteTimeSeconds = selectedTimeSeconds;
+        updateTimerDisplay();
+        blackPieceWin.setVisible(false);
+        whitePieceWin.setVisible(false);
+        blackPieceLoose.setVisible(false);
+        whitePieceLoose.setVisible(false);
+        checkMateBlack.setVisible(false);
+        checkMateWhite.setVisible(false);
+        notificationWinPage.setVisible(false);
+        gameEnded = false;
         board.draw(boardGameChess);
         updateTurnIndicators();
     }
@@ -330,20 +401,20 @@ public class ChessController {
     }
 
     private String formatTime(int seconds) {
-        int minutes = seconds / 60;
-        int secs = seconds % 60;
-        return String.format("%02d:%02d", minutes, secs);
+        return String.format("%02d:%02d", seconds / 60, seconds % 60);
     }
 
     private void updateTurnIndicators() {
+        boolean isWhiteTurn = board.isWhiteTurn();
         blackTurn.setVisible(!isWhiteTurn);
         whiteTurn.setVisible(isWhiteTurn);
-    }
+        blackTextTurn.setVisible(!isWhiteTurn);
+        whiteTextTurn.setVisible(isWhiteTurn);
 
-    private void initializeRestartButton() {
-        if (restart != null) {
-            restart.setOnMouseClicked(event -> resetGame());
-        }
+        whiteTurn.getStyleClass().setAll(isWhiteTurn ? "white-turn" : "white-turn-inactive");
+        blackTurn.getStyleClass().setAll(isWhiteTurn ? "black-turn-inactive" : "black-turn");
+        whiteTextTurn.setFill(isWhiteTurn ? javafx.scene.paint.Color.BLACK : javafx.scene.paint.Color.WHITE);
+        blackTextTurn.setFill(isWhiteTurn ? javafx.scene.paint.Color.WHITE : javafx.scene.paint.Color.BLACK);
     }
 
     public int getSelectedTimeSeconds() {
