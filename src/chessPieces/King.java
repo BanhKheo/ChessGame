@@ -24,7 +24,7 @@ public class King extends Piece {
                 Piece rook = board[oldRow][7];
                 if (rook instanceof Rook && !((Rook) rook).isMoved()) {
                     if (board[oldRow][5] == null && board[oldRow][6] == null &&
-                        !isSquareUnderAttack(board, newCol, newCol , isWhite  )) {
+                            !isSquareUnderAttack(board, newCol, newCol , isWhite  )) {
                         return true;
                     }
                 }
@@ -67,6 +67,14 @@ public class King extends Piece {
         }
         return null;
     }
+
+
+
+    @Override
+    public int getValue() {
+        return 1000;
+    }
+
 
     public boolean isMoved() {
         return isMove;

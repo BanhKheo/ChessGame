@@ -85,11 +85,8 @@ public class ChessController {
             scene.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
                 if (notificationWinPage.isVisible() && !isChildOf((Node) event.getTarget(), notificationWinPage)) {
                     event.consume();
-                    System.out.println("Click outside notificationWinPage blocked");
                 }
             });
-        } else {
-            System.out.println("Scene not available in setBoard");
         }
     }
 

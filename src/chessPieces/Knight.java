@@ -1,6 +1,5 @@
 package chessPieces;
 
-import main.Board;
 import utilz.LoadImage;
 
 public class Knight extends Piece {
@@ -14,5 +13,9 @@ public class Knight extends Piece {
         int colDiff = Math.abs(newCol - oldCol);
 
         return (rowDiff == 2 && colDiff == 1) || (rowDiff == 1 && colDiff == 2);
+    }
+    @Override
+    public int getValue() {
+        return 3;
     }
 }
