@@ -59,4 +59,9 @@ public class Rook extends Piece {
         this.isMove = moved;
     }
 
+    @Override
+    public int getValue() {
+        return 5;
+    }
+
 }

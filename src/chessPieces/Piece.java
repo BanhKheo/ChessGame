@@ -62,6 +62,7 @@ public abstract class Piece {
         return false;
     }
 
+    public abstract int getValue();
 
     public abstract boolean logicMove(int oldRow , int oldCol , int newRow , int newCol, Piece[][] board);
 

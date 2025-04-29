@@ -45,4 +45,8 @@ public class Pawn extends Piece {
     public void setMove (boolean move) {
         this.isMove = move;
     }
+    @Override
+    public int getValue() {
+        return 1;
+    }
 }
