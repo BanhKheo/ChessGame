@@ -56,13 +56,13 @@ public class ChessController {
     private AnchorPane boardGameChess;
 
     private Board board;
-    private int selectedTimeSeconds = 600; // Default to 10 minutes
+    private int selectedTimeSeconds = 600;
     private Timeline blackTimer, whiteTimer;
     private int blackTimeSeconds, whiteTimeSeconds;
     private boolean isFirstMove = true;
     private Game game;
     private boolean gameEnded = false;
-    private double dragOffsetX, dragOffsetY; // For dragging notificationWinPage
+    private double dragOffsetX, dragOffsetY;
 
     public void setGame(Game game) {
         this.game = game;
@@ -90,12 +90,15 @@ public class ChessController {
         }
     }
 
-    private boolean isChildOf(Node node, Node parent) {
-        while (node != null) {
-            if (node == parent) return true;
-            node = node.getParent();
+    public Board getBoard() {
+        return board;
+    }
+
+    public void showBotThinking(boolean show) {
+        Text botThinking = (Text) boardGameChess.getScene().lookup("#botThinking");
+        if (botThinking != null) {
+            botThinking.setVisible(show);
         }
-        return false;
     }
 
     public void redraw() {
@@ -276,7 +279,7 @@ public class ChessController {
             dragOffsetX = event.getX();
             dragOffsetY = event.getY();
             System.out.println("Mouse pressed on notificationWinPage at: " + dragOffsetX + ", " + dragOffsetY);
-            event.consume(); // Prevent click from propagating
+            event.consume();
         });
 
         notificationWinPage.setOnMouseDragged(event -> {
@@ -286,25 +289,21 @@ public class ChessController {
                 return;
             }
 
-            // Calculate new position
             double newX = event.getSceneX() - dragOffsetX;
             double newY = event.getSceneY() - dragOffsetY;
 
-            // Get scene bounds
             double sceneWidth = scene.getWidth();
             double sceneHeight = scene.getHeight();
             double paneWidth = notificationWinPage.getWidth();
             double paneHeight = notificationWinPage.getHeight();
 
-            // Restrict to scene bounds
             newX = Math.max(0, Math.min(newX, sceneWidth - paneWidth));
             newY = Math.max(0, Math.min(newY, sceneHeight - paneHeight));
 
-            // Update position
             notificationWinPage.setLayoutX(newX);
             notificationWinPage.setLayoutY(newY);
             System.out.println("Dragging notificationWinPage to: " + newX + ", " + newY);
-            event.consume(); // Prevent drag from propagating
+            event.consume();
         });
     }
 
@@ -336,7 +335,6 @@ public class ChessController {
         boolean isPlayingWithBot = botName.isVisible();
         String winnerName = whiteWins ? player1Name.getText() : isPlayingWithBot ? botName.getText() : player2Name.getText();
 
-        // Update piece visuals
         whitePieceWin.setVisible(whiteWins);
         blackPieceLoose.setVisible(whiteWins);
         blackPieceWin.setVisible(!whiteWins);
@@ -344,7 +342,6 @@ public class ChessController {
         checkMateWhite.setVisible(whiteWins);
         checkMateBlack.setVisible(!whiteWins);
 
-        // Update winner text
         winner1.setVisible(false);
         winner2.setVisible(false);
         botWin.setVisible(false);
@@ -387,6 +384,8 @@ public class ChessController {
         checkMateBlack.setVisible(false);
         checkMateWhite.setVisible(false);
         notificationWinPage.setVisible(false);
+        notificationWinPage.setLayoutX(260);
+        notificationWinPage.setLayoutY(100);
         gameEnded = false;
         board.draw(boardGameChess);
         updateTurnIndicators();
@@ -416,5 +415,13 @@ public class ChessController {
 
     public int getSelectedTimeSeconds() {
         return selectedTimeSeconds;
+    }
+
+    private boolean isChildOf(Node node, Node parent) {
+        while (node != null) {
+            if (node == parent) return true;
+            node = node.getParent();
+        }
+        return false;
     }
 }

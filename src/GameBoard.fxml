@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<Pane fx:id="playingChessPage" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="792.0" prefWidth="1170.0" style="-fx-background-color: #373232;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.ChessController">
+<Pane fx:id="playingChessPage" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="792.0" prefWidth="1170.0" style="-fx-background-color: #373232;" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.ChessController">
    <children>
       <AnchorPane layoutX="40.0" layoutY="2.0" prefHeight="31.0" prefWidth="165.0" style="-fx-background-color: FFFFFF; -fx-background-radius: 10;">
          <children>
@@ -534,8 +536,15 @@
             </AnchorPane>
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="boardGameChess" layoutX="39.0" layoutY="44.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="704.0" prefWidth="704.0" />
-      <AnchorPane fx:id="notificationWinPage" layoutX="260.0" layoutY="100.0" prefHeight="595.0" prefWidth="250.0" style="-fx-background-color: white; -fx-background-radius: 24;" stylesheets="@stylesheet.css">
+      <AnchorPane fx:id="boardGameChess" layoutX="39.0" layoutY="44.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="704.0" prefWidth="704.0">
+         <children>
+            <BorderPane fx:id="phonghauChess" layoutX="173.0" layoutY="521.0" prefHeight="80.0" prefWidth="320.0" style="-fx-background-color: white; -fx-border-color: black; -fx-border-width: 2;" visible="false">
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </BorderPane>
+         </children></AnchorPane>
+      <AnchorPane fx:id="notificationWinPage" layoutX="260.0" layoutY="100.0" prefHeight="595.0" prefWidth="250.0" style="-fx-background-color: white; -fx-background-radius: 24;" stylesheets="@stylesheet.css" visible="false">
          <children>
             <AnchorPane prefHeight="150.0" prefWidth="250.0" style="-fx-background-color: #2B2A2A; -fx-background-radius: 24 24 0 0;">
                <children>

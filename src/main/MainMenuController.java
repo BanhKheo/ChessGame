@@ -1,13 +1,8 @@
 package main;
 
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-
-import java.io.IOException;
 
 public class MainMenuController {
 
@@ -19,7 +14,7 @@ public class MainMenuController {
 
     private String player1Name = "Player 1"; // Default name for Player 1
     private String player2Name = "Player 2"; // Default name for Player 2
-    private String botName = "Bot"; // Default bot name, matching GameBoard.fxml
+    private String botName = "Bot"; // Default bot name
     private Game game;
 
     @FXML
@@ -49,6 +44,10 @@ public class MainMenuController {
         // Get the ChessController to pass player names
         ChessController chessController = game.getChessController();
 
+        // Configure the Board for the game mode
+        Board board = chessController.getBoard();
+        board.setAIEnabled(isPlayingWithBot);
+
         // Set player names based on the mode
         if (isPlayingWithBot) {
             chessController.setPlayerNames(player1Name, botName, true);
@@ -56,7 +55,7 @@ public class MainMenuController {
             chessController.setPlayerNames(player1Name, player2Name, false);
         }
 
-        // Switch to the chess scene (this will center the stage and set the timer)
+        // Switch to the chess scene
         game.switchToChessScene(stage);
     }
 
