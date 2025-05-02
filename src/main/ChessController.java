@@ -424,4 +424,8 @@ public class ChessController {
         }
         return false;
     }
+
+    public boolean isGameEnded() {
+        return gameEnded;
+    }
 }
