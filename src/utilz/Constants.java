@@ -11,4 +11,19 @@ public class Constants {
     public static final int PAWN = 6;
 
 
+    public static int getType(Piece piece) {
+        if (piece == null) return -1;
+
+        if (piece instanceof Rook) return ROOK;
+        if (piece instanceof Knight) return KNIGHT;
+        if (piece instanceof Bishop) return BISHOP;
+        if (piece instanceof Queen) return QUEEN;
+        if (piece instanceof King) return KING;
+        if (piece instanceof Pawn) return PAWN;
+
+        return -1;
+    }
+
+
+
 }

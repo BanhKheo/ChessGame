@@ -3,7 +3,10 @@ package main;
 import chessPieces.*;
 import javafx.application.Platform;
 import javafx.scene.layout.AnchorPane;
+import utilz.MoveSnapshot;
 import ai.ChessAI;
+import static utilz.Constants.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -38,35 +41,44 @@ public class Board {
         int col = x / Game.GAME_TILES;
         int row = y / Game.GAME_TILES;
 
-        if (col < 0 || col >= 8 || row < 0 || row >= 8) {
+        if (col < 0 || col >= 8 ||  row < 0 || row >= 8) {
             return;
         }
 
         Piece clickedPiece = board[row][col];
 
         if (selectedPiece == null) {
+            // Select a piece if it's the player's turn and the piece belongs to them
             if (clickedPiece != null && clickedPiece.isWhite() == whiteTurn) {
                 selectedPiece = clickedPiece;
                 validMoves = getValidMoves(selectedPiece);
+                chessController.redraw();
             }
         } else {
             if (clickedPiece == selectedPiece) {
                 // Deselect the piece if clicked again
                 selectedPiece = null;
                 validMoves.clear();
+                chessController.redraw();
+            } else if (clickedPiece != null && clickedPiece.isWhite() == whiteTurn) {
+                // Select a new piece if it's the player's piece
+                selectedPiece = clickedPiece;
+                validMoves = getValidMoves(selectedPiece);
+                chessController.redraw();
             } else {
-                // Attempt to move or select a new piece
-                movePiece(selectedPiece, col, row);
-                selectedPiece = null;
-                validMoves.clear();
-                // If no move was made and a new piece is clicked, select it
-                if (clickedPiece != null && clickedPiece.isWhite() == whiteTurn) {
-                    selectedPiece = clickedPiece;
-                    validMoves = getValidMoves(selectedPiece);
+                // Attempt to move to the clicked square if it's a valid move
+                for (int[] move : validMoves) {
+                    if (move[0] == col && move[1] == row) {
+                        movePiece(selectedPiece, col, row);
+                        selectedPiece = null;
+                        validMoves.clear();
+                        chessController.redraw();
+                        break;
+                    }
                 }
+                // If not a valid move, keep the current selection (don't deselect)
             }
         }
-        chessController.redraw(); // Redraw to update circles
     }
 
     private void movePiece(Piece piece, int col, int row) {
@@ -139,17 +151,24 @@ public class Board {
                             }
                         }
                     }
+
                     chessController.showBotThinking(false);
                 });
             } catch (Exception e) {
                 e.printStackTrace();
                 Platform.runLater(() -> {
+                    if (isCheckmate(true)) {
+                        chessController.handleCheckmate(false); // AI vừa thắng
+                        return;
+                    }
+                    whiteTurn = true;
                     isPlayerMoving = true;
-                    chessController.showBotThinking(false);
+
                 });
             }
         });
     }
+
 
     public void shutdown() {
         aiExecutor.shutdown();
@@ -268,16 +287,18 @@ public class Board {
                 {1, 2, 3, 4, 5, 3, 2, 1}
         };
         for (int row = 0; row < 8; row++) {
-            boolean isWhite = (row >= 6);
             for (int col = 0; col < 8; col++) {
-                switch (initialBoard[row][col]) {
-                    case 1 -> board[row][col] = new Rook(col, row, isWhite);
-                    case 2 -> board[row][col] = new Knight(col, row, isWhite);
-                    case 3 -> board[row][col] = new Bishop(col, row, isWhite);
-                    case 4 -> board[row][col] = new Queen(col, row, isWhite);
-                    case 5 -> board[row][col] = new King(col, row, isWhite);
-                    case 6 -> board[row][col] = new Pawn(col, row, isWhite);
-                    default -> {}
+                boolean isWhite = row >= 6; // White pieces on rows 6 and 7
+                int type = initialBoard[row][col];
+
+                switch (type) {
+                    case ROOK -> board[row][col] = new Rook(col, row, isWhite);
+                    case KNIGHT -> board[row][col] = new Knight(col, row, isWhite);
+                    case BISHOP -> board[row][col] = new Bishop(col, row, isWhite);
+                    case QUEEN -> board[row][col] = new Queen(col, row, isWhite);
+                    case KING -> board[row][col] = new King(col, row, isWhite);
+                    case PAWN -> board[row][col] = new Pawn(col, row, isWhite);
+                    default -> board[row][col] = null;
                 }
             }
         }
@@ -357,13 +378,26 @@ public class Board {
         }
     }
 
-    public void simulateMove(ChessAI.Move move) {
-        move.capturedPiece = board[move.toRow][move.toCol];
-        board[move.fromRow][move.fromCol] = null;
-        board[move.toRow][move.toCol] = move.piece;
-        move.piece.setRow(move.toRow);
-        move.piece.setCol(move.toCol);
+    public MoveSnapshot simulateMove(Piece piece, int toRow, int toCol) {
+        int fromRow = piece.getRow();
+        int fromCol = piece.getCol();
+        Piece captured = board[toRow][toCol];
+
+        // Save current state
+        MoveSnapshot snapshot = new MoveSnapshot(piece, captured, fromRow, fromCol, toRow, toCol);
+
+        // Perform simulated move
+        board[toRow][toCol] = piece;
+        board[fromRow][fromCol] = null;
+        piece.setRow(toRow);
+        piece.setCol(toCol);
+
+        return snapshot;
     }
+
+
+
+
 
     public List<ChessAI.Move> getAllLegalMoves(boolean isWhite) {
         List<ChessAI.Move> legalMoves = new ArrayList<>();
@@ -381,12 +415,20 @@ public class Board {
         return legalMoves;
     }
 
-    public void undoMove(ChessAI.Move move) {
-        board[move.toRow][move.toCol] = move.capturedPiece;
-        board[move.fromRow][move.fromCol] = move.piece;
-        move.piece.setRow(move.fromRow);
-        move.piece.setCol(move.fromCol);
+    public void undoMove(MoveSnapshot snapshot) {
+        Piece movingPiece = snapshot.movedPiece;
+        Piece capturedPiece = snapshot.capturedPiece;
+
+        // Restore piece positions
+        board[snapshot.fromRow][snapshot.fromCol] = movingPiece;
+        board[snapshot.toRow][snapshot.toCol] = capturedPiece;
+
+        // Restore position of moving piece
+        movingPiece.setRow(snapshot.fromRow);
+        movingPiece.setCol(snapshot.fromCol);
+
     }
+
 
     private boolean isSquareUnderAttack(int row, int col, boolean byWhite) {
         for (int r = 0; r < 8; r++) {
@@ -480,5 +522,13 @@ public class Board {
 
     public ChessController getChessController() {
         return chessController;
+    }
+
+    public boolean isGameEnded(){
+        return chessController.isGameEnded();
+    }
+
+    public Piece[][] getBoard() {
+        return board;
     }
 }
