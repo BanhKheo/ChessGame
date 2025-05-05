@@ -10,9 +10,11 @@ import javafx.util.Duration;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.Scene;
 import javafx.scene.Node;
+import utilz.MoveSnapshot;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Stack;
 
 public class ChessController {
 
@@ -44,6 +46,9 @@ public class ChessController {
     private AnchorPane notificationWinPage;
 
     @FXML
+    private AnchorPane undo, restart;
+
+    @FXML
     private Text winner1, winner2, botWin;
 
     @FXML
@@ -63,6 +68,15 @@ public class ChessController {
     private Game game;
     private boolean gameEnded = false;
     private double dragOffsetX, dragOffsetY;
+    private boolean isAIEnabled = false;
+    private boolean isPlayerMoving = true;
+
+    // Stack to store move history for undoing
+    private Stack<MoveSnapshot> moveHistory = new Stack<>();
+
+    // Track Timer state before each move
+    private Stack<Integer> blackTimeHistory = new Stack<>();
+    private Stack<Integer> whiteTimeHistory = new Stack<>();
 
     public void setGame(Game game) {
         this.game = game;
@@ -76,6 +90,8 @@ public class ChessController {
         initializePlayGame();
         initializeBoardInteraction();
         initializeNotificationWinPage();
+        initializeUndoButton();
+        initializeRestartButton();
         initializeSurrenderButton();
         board.draw(boardGameChess);
         updateTurnIndicators();
@@ -89,6 +105,69 @@ public class ChessController {
             });
         }
     }
+
+    public void addMoveSnapshot(MoveSnapshot snapshot) {
+        moveHistory.push(snapshot);
+        blackTimeHistory.push(blackTimeSeconds);
+        whiteTimeHistory.push(whiteTimeSeconds);
+        if (undo != null) {
+            undo.setDisable(false);
+        }
+    }
+
+    // New method to initialize undo button
+    private void initializeUndoButton() {
+        if (undo != null) {
+            undo.setOnMouseClicked(event -> handleUndo());
+            undo.setDisable(true); // Disable until a move is made
+        } else {
+            System.out.println("Undo button not found in FXML");
+        }
+    }
+
+
+
+    private void handleUndo() {
+        if (gameEnded || moveHistory.isEmpty()) {
+            return; // No moves to undo or game has ended
+        }
+
+        // Pause timers
+        stopTimers();
+
+        // Undo the last move
+        MoveSnapshot snapshot = moveHistory.pop();
+        board.undoMove(snapshot);
+
+        // Restore timer state
+        blackTimeSeconds = blackTimeHistory.pop();
+        whiteTimeSeconds = whiteTimeHistory.pop();
+        updateTimerDisplay();
+
+        // Restore turn and player moving state
+        isPlayerMoving = true;
+
+        // Redraw board and update UI
+        redraw();
+
+        // Disable undo button if no moves remain
+        undo.setDisable(moveHistory.isEmpty());
+
+        // If AI is enabled and it's AI's turn, undo AI's move as well
+        if (isAIEnabled && !board.isWhiteTurn()) {
+            if (!moveHistory.isEmpty()) {
+                snapshot = moveHistory.pop();
+                board.undoMove(snapshot);
+                blackTimeSeconds = blackTimeHistory.pop();
+                whiteTimeSeconds = whiteTimeHistory.pop();
+                updateTimerDisplay();
+                isPlayerMoving = true;
+                redraw();
+                undo.setDisable(moveHistory.isEmpty());
+            }
+        }
+    }
+
 
     public Board getBoard() {
         return board;
@@ -317,6 +396,13 @@ public class ChessController {
         }
     }
 
+    private void initializeRestartButton() {
+        if (restart != null) {
+            restart.setOnMouseClicked(event -> resetGame());
+        }
+
+    }
+
     public void surrender() {
         boolean isWhiteSurrendering = board.isWhiteTurn();
         String message = isWhiteSurrendering ? "White surrenders! Black wins." : "Black surrenders! White wins.";
@@ -386,6 +472,8 @@ public class ChessController {
         notificationWinPage.setVisible(false);
         notificationWinPage.setLayoutX(260);
         notificationWinPage.setLayoutY(100);
+        moveHistory.clear();
+        undo.setDisable(true);
         gameEnded = false;
         board.draw(boardGameChess);
         updateTurnIndicators();

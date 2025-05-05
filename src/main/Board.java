@@ -89,6 +89,20 @@ public class Board {
                 int oldRow = piece.getRow();
                 int oldCol = piece.getCol();
 
+                // Determine first-move status before moving
+                boolean wasFirstMove = false;
+                if (piece instanceof Pawn) {
+                    wasFirstMove = !((Pawn) piece).isMoved();
+                } else if (piece instanceof Rook) {
+                    wasFirstMove = !((Rook) piece).isMoved();
+                } else if (piece instanceof King) {
+                    wasFirstMove = !((King) piece).isMoved();
+                }
+
+                MoveSnapshot snapshot = new MoveSnapshot(piece, board[row][col], oldRow, oldCol, row, col, whiteTurn, wasFirstMove);
+                chessController.addMoveSnapshot(snapshot);
+
+
                 board[oldRow][oldCol] = null;
 
                 if (piece instanceof Pawn pawn) {
@@ -384,7 +398,7 @@ public class Board {
         Piece captured = board[toRow][toCol];
 
         // Save current state
-        MoveSnapshot snapshot = new MoveSnapshot(piece, captured, fromRow, fromCol, toRow, toCol);
+        MoveSnapshot snapshot = new MoveSnapshot(piece, captured, fromRow, fromCol, toRow, toCol, false, false);
 
         // Perform simulated move
         board[toRow][toCol] = piece;

@@ -12,13 +12,20 @@ public class MoveSnapshot {
     public boolean capturedPieceFirstMove;
 
     public MoveSnapshot(Piece movedPiece, Piece capturedPiece,
-                        int fromRow, int fromCol, int toRow, int toCol) {
+                        int fromRow, int fromCol, int toRow, int toCol, boolean whiteTurnBeforeMove, boolean movedPieceFirstMove) {
         this.movedPiece = movedPiece;
         this.capturedPiece = capturedPiece;
         this.fromRow = fromRow;
         this.fromCol = fromCol;
         this.toRow = toRow;
         this.toCol = toCol;
+        this.whiteTurnBeforeMove = whiteTurnBeforeMove;
+        this.movedPieceFirstMove = movedPieceFirstMove;
+        this.capturedPieceFirstMove = false; // Set if needed for en passant or other case
+    }
+
+    public boolean isWhiteTurnBeforeMove() {
+        return whiteTurnBeforeMove;
     }
 }
 
