@@ -10,9 +10,11 @@ import javafx.util.Duration;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.Scene;
 import javafx.scene.Node;
+import utilz.MoveSnapshot;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Stack;
 
 public class ChessController {
 
@@ -44,6 +46,9 @@ public class ChessController {
     private AnchorPane notificationWinPage;
 
     @FXML
+    private AnchorPane undo, restart;
+
+    @FXML
     private Text winner1, winner2, botWin;
 
     @FXML
@@ -63,6 +68,12 @@ public class ChessController {
     private Game game;
     private boolean gameEnded = false;
     private double dragOffsetX, dragOffsetY;
+    private boolean isAIEnabled = false;
+    private boolean isPlayerInputEnable = true;
+    private Stack<MoveSnapshot> moveHistory = new Stack<>(); // Stack to store move history for undoing
+    // Track Timer state before each move
+    private Stack<Integer> blackTimeHistory = new Stack<>();
+    private Stack<Integer> whiteTimeHistory = new Stack<>();
 
     public void setGame(Game game) {
         this.game = game;
@@ -76,6 +87,8 @@ public class ChessController {
         initializePlayGame();
         initializeBoardInteraction();
         initializeNotificationWinPage();
+        initializeUndoButton();
+        initializeRestartButton();
         initializeSurrenderButton();
         board.draw(boardGameChess);
         updateTurnIndicators();
@@ -89,6 +102,67 @@ public class ChessController {
             });
         }
     }
+
+    public void addMoveSnapshot(MoveSnapshot snapshot) {
+        moveHistory.push(snapshot);
+        blackTimeHistory.push(blackTimeSeconds);
+        whiteTimeHistory.push(whiteTimeSeconds);
+        if (undo != null) {
+            undo.setDisable(false);
+        }
+    }
+
+    // Initialize undo button
+    private void initializeUndoButton() {
+        if (undo != null) {
+            undo.setOnMouseClicked(event -> handleUndo());
+            undo.setDisable(true); // Disable until a move is made
+        } else {
+            System.out.println("Undo button not found in FXML");
+        }
+    }
+
+
+
+    private void handleUndo() {
+        if (gameEnded || moveHistory.isEmpty()) {
+            return; // No moves to undo or game has ended
+        }
+
+        // Pause timers
+        stopTimers();
+
+        // Undo player's move
+        undoSingleMove();
+
+        // If playing with AI and it's AI turn, undo AI's move
+        if (isAIEnabled && !board.isWhiteTurn() && !moveHistory.isEmpty()) undoSingleMove();
+
+        // Update UI and game state
+        board.setWhiteTurn(moveHistory.isEmpty() || moveHistory.peek().isWhiteTurnBeforeMove());
+        isPlayerInputEnable = true;
+        updateTimerDisplay();
+        redraw();
+        undo.setDisable(moveHistory.isEmpty());
+
+        // Check game state after undo
+        if (board.isCheckmate(board.isWhiteTurn())) {
+            handleCheckmate(!board.isWhiteTurn());
+        }
+    }
+
+
+    // Undo a single move
+    private void undoSingleMove() {
+        if (moveHistory.isEmpty() || blackTimeHistory.isEmpty() || whiteTimeHistory.isEmpty()) return;
+
+        MoveSnapshot snapshot = moveHistory.pop();
+        board.undoMove(snapshot);
+
+        blackTimeSeconds = blackTimeHistory.pop();
+        whiteTimeSeconds = whiteTimeHistory.pop();
+    }
+
 
     public Board getBoard() {
         return board;
@@ -254,6 +328,8 @@ public class ChessController {
         System.out.println("Timers initialized: blackTimer=" + (blackTimer != null) + ", whiteTimer=" + (whiteTimer != null));
     }
 
+
+
     private void initializeNotificationWinPage() {
         AnchorPane turnOffWinPage = (AnchorPane) notificationWinPage.lookup("#turnOffWinPage");
         if (turnOffWinPage != null) {
@@ -307,6 +383,8 @@ public class ChessController {
         });
     }
 
+
+
     private void initializeSurrenderButton() {
         if (surrender != null) {
             surrender.setOnMouseClicked(event -> {
@@ -317,16 +395,31 @@ public class ChessController {
         }
     }
 
+
+
     public void surrender() {
         boolean isWhiteSurrendering = board.isWhiteTurn();
         String message = isWhiteSurrendering ? "White surrenders! Black wins." : "Black surrenders! White wins.";
         endGame(!isWhiteSurrendering, message);
     }
 
+
+
+    private void initializeRestartButton() {
+        if (restart != null) {
+            restart.setOnMouseClicked(event -> resetGame());
+        }
+
+    }
+
+
+
     public void handleCheckmate(boolean isWhiteTurn) {
         String message = isWhiteTurn ? "Black wins! White is checkmated." : "White wins! Black is checkmated.";
         endGame(!isWhiteTurn, message);
     }
+
+
 
     private void endGame(boolean whiteWins, String message) {
         stopTimers();
@@ -386,19 +479,27 @@ public class ChessController {
         notificationWinPage.setVisible(false);
         notificationWinPage.setLayoutX(260);
         notificationWinPage.setLayoutY(100);
+        moveHistory.clear();
+        undo.setDisable(true);
         gameEnded = false;
         board.draw(boardGameChess);
         updateTurnIndicators();
     }
+
+
 
     private void updateTimerDisplay() {
         blackTime.setText(formatTime(blackTimeSeconds));
         whiteTime.setText(formatTime(whiteTimeSeconds));
     }
 
+
+
     private String formatTime(int seconds) {
         return String.format("%02d:%02d", seconds / 60, seconds % 60);
     }
+
+
 
     private void updateTurnIndicators() {
         boolean isWhiteTurn = board.isWhiteTurn();

@@ -14,9 +14,13 @@ import java.util.concurrent.Executors;
 
 public class Board {
 
-    private List<int[]> validMoves = new ArrayList<>();
-    private Piece selectedPiece;
     private Piece[][] board = new Piece[8][8];
+    private List<int[]> validMoves = new ArrayList<>();
+    private final List<Piece> whitePieces = new ArrayList<>();
+    private final List<Piece> blackPieces = new ArrayList<>();
+    private int whiteKingRow = -1, whiteKingCol = -1;
+    private int blackKingRow = -1, blackKingCol = -1;
+    private Piece selectedPiece;
     private boolean whiteTurn = true;
     private boolean isPlayerMoving = true;
     private ChessController chessController;
@@ -24,18 +28,26 @@ public class Board {
     private ChessAI ai;
     private boolean isAIEnabled = false; // Flag to control AI
 
+
+
     public Board() {
         initializePieces();
     }
+
+
 
     public void setChessController(ChessController controller) {
         this.chessController = controller;
     }
 
+
+
     public void setAIEnabled(boolean enabled) {
         this.isAIEnabled = enabled;
         this.ai = enabled ? new ChessAI(false) : null; // AI plays as black if enabled
     }
+
+
 
     public void handleSelectedPiece(int x, int y) {
         int col = x / Game.GAME_TILES;
@@ -54,7 +66,9 @@ public class Board {
                 validMoves = getValidMoves(selectedPiece);
                 chessController.redraw();
             }
-        } else {
+        }
+
+        else {
             if (clickedPiece == selectedPiece) {
                 // Deselect the piece if clicked again
                 selectedPiece = null;
@@ -81,52 +95,74 @@ public class Board {
         }
     }
 
+
+
     private void movePiece(Piece piece, int col, int row) {
         synchronized (this) {
-            if (legalMove(piece, col, row) && isPlayerMoving) {
-                isPlayerMoving = false;
+            if (!legalMove(piece, col, row) || !isPlayerMoving) return;
 
-                int oldRow = piece.getRow();
-                int oldCol = piece.getCol();
+            isPlayerMoving = false;
 
-                board[oldRow][oldCol] = null;
+            int oldRow = piece.getRow();
+            int oldCol = piece.getCol();
 
-                if (piece instanceof Pawn pawn) {
-                    pawn.setMove(true);
-                }
-                if (piece instanceof Rook rook) {
-                    rook.setMove(true);
-                }
-                if (piece instanceof King king) {
-                    king.setMove(true);
-                    handleCastling(king, oldCol, row, col);
-                }
+            // Record first-move status
+            boolean wasFirstMove = recordFirstMoveStatus(piece);
+            MoveSnapshot snapshot = new MoveSnapshot(piece, board[row][col], oldRow, oldCol, row, col, whiteTurn, wasFirstMove);
+            chessController.addMoveSnapshot(snapshot);
 
-                piece.setRow(row);
-                piece.setCol(col);
+            board[oldRow][oldCol] = null;
+            piece.setRow(row);
+            piece.setCol(col);
+            board[row][col] = piece;
+
+            // Update move status and special move
+            updateMoveStatus(piece);
+            if (piece instanceof King king) {
+                handleCastling(king, oldCol, row, col);
+                updateKingPosition(king, row, col);
                 board[row][col] = piece;
+            }
 
-                boolean opponentInCheckmate = isCheckmate(!whiteTurn);
 
-                if (opponentInCheckmate) {
-                    if (chessController != null) {
-                        chessController.handleCheckmate(whiteTurn);
-                    }
+            // Check for checkmate
+            boolean opponentInCheckmate = isCheckmate(!whiteTurn);
+            if (opponentInCheckmate) {
+                if (chessController != null) {
+                    chessController.handleCheckmate(whiteTurn);
                 }
+            }
 
-                whiteTurn = !whiteTurn;
+            // Switch turn
+            whiteTurn = !whiteTurn;
+            chessController.redraw();
 
-                chessController.redraw();
-
-                if (isAITurn()) {
-                    performAIMove();
-                } else {
-                    isPlayerMoving = true; // Allow next player move if not AI's turn
-                }
+            // Trigger AI move
+            if (isAITurn()) {
+                performAIMove();
+            }
+            else {
+                isPlayerMoving = true; // Allow next player move if not AI's turn
             }
         }
     }
 
+
+
+    private boolean recordFirstMoveStatus(Piece piece) {
+        if (piece instanceof Pawn pawn) { return !pawn.isMoved(); }
+        if (piece instanceof King king) { return !king.isMoved(); }
+        if (piece instanceof Rook rook) { return !rook.isMoved(); }
+        return false;
+    }
+
+
+
+    private void updateMoveStatus(Piece piece) {
+        if (piece instanceof Pawn pawn) pawn.setMove(true);
+        else if (piece instanceof King king) king.setMove(true);
+        else if (piece instanceof Rook rook) rook.setMove(true);
+    }
     private void performAIMove() {
         chessController.showBotThinking(true);
         aiExecutor.submit(() -> {
@@ -170,9 +206,12 @@ public class Board {
     }
 
 
+
     public void shutdown() {
         aiExecutor.shutdown();
     }
+
+
 
     private void handleCastling(King king, int oldCol, int row, int col) {
         if (col == oldCol + 2) {
@@ -182,6 +221,8 @@ public class Board {
         }
     }
 
+
+
     private void moveRookForCastling(int row, int rookCol, int targetCol) {
         Piece rook = board[row][rookCol];
         if (rook instanceof Rook) {
@@ -189,21 +230,30 @@ public class Board {
             rook.setCol(targetCol);
             board[row][targetCol] = rook;
             ((Rook) rook).setMove(true);
+            List<Piece> pieces = rook.isWhite() ? whitePieces : blackPieces;
+            pieces.remove(rook);
+            pieces.add(rook);
         }
     }
+
+
 
     public void resetBoard() {
         board = new Piece[8][8];
         whiteTurn = true;
         selectedPiece = null;
         validMoves.clear();
+        whiteKingRow = whiteKingCol = blackKingRow = blackKingCol = -1;
         initializePieces();
         if (isAIEnabled) {
             ai = new ChessAI(false);
         } else {
             ai = null;
         }
+        chessController.redraw();
     }
+
+
 
     private boolean legalMove(Piece piece, int col, int row) {
         if (!piece.logicMove(piece.getRow(), piece.getCol(), row, col, board)) {
@@ -217,8 +267,13 @@ public class Board {
         return true;
     }
 
+
+
+    // Check if game is ended
     public boolean isCheckmate(boolean white) {
-        if (!isKingInCheck(white)) return false;
+        if (!isKingInCheck(white)) return false; // Check King is attacking by enemies
+
+        // Find which pieces can protect king
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 Piece piece = board[row][col];
@@ -249,8 +304,10 @@ public class Board {
         return true;
     }
 
+
     public boolean isKingInCheck(boolean isWhitePlayer) {
         int kingRow = -1, kingCol = -1;
+
         for (int r = 0; r < 8; r++) {
             for (int c = 0; c < 8; c++) {
                 Piece piece = board[r][c];
@@ -260,6 +317,7 @@ public class Board {
                     break;
                 }
             }
+            if (kingRow != -1) break;
         }
         for (int r = 0; r < 8; r++) {
             for (int c = 0; c < 8; c++) {
@@ -275,6 +333,8 @@ public class Board {
         return false;
     }
 
+
+
     private void initializePieces() {
         int[][] initialBoard = {
                 {1, 2, 3, 4, 5, 3, 2, 1},
@@ -286,12 +346,16 @@ public class Board {
                 {6, 6, 6, 6, 6, 6, 6, 6},
                 {1, 2, 3, 4, 5, 3, 2, 1}
         };
+
+        whitePieces.clear();
+        blackPieces.clear();
+
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 boolean isWhite = row >= 6; // White pieces on rows 6 and 7
                 int type = initialBoard[row][col];
 
-                switch (type) {
+                Piece piece = switch (type) {
                     case ROOK -> board[row][col] = new Rook(col, row, isWhite);
                     case KNIGHT -> board[row][col] = new Knight(col, row, isWhite);
                     case BISHOP -> board[row][col] = new Bishop(col, row, isWhite);
@@ -299,17 +363,29 @@ public class Board {
                     case KING -> board[row][col] = new King(col, row, isWhite);
                     case PAWN -> board[row][col] = new Pawn(col, row, isWhite);
                     default -> board[row][col] = null;
+                };
+
+                board[row][col] = piece;
+                if (piece != null) {
+                    if (isWhite) whitePieces.add(piece);
+                    else blackPieces.add(piece);
+
+                    if (piece instanceof King) updateKingPosition((King) piece, row, col);
                 }
             }
         }
     }
+
+
 
     private List<int[]> getValidMoves(Piece piece) {
         List<int[]> moves = new ArrayList<>();
         boolean wasMoved = false;
         if (piece instanceof Pawn pawn) {
             wasMoved = pawn.isMoved();
-        } else if (piece instanceof King king) {
+        }
+
+        else if (piece instanceof King king) {
             wasMoved = king.isMoved();
             if (!king.isMoved() && !isKingInCheck(king.isWhite())) {
                 int row = king.getRow();
@@ -346,11 +422,15 @@ public class Board {
         }
         if (piece instanceof Pawn pawn) {
             pawn.setMove(wasMoved);
-        } else if (piece instanceof King king) {
+        }
+
+        else if (piece instanceof King king) {
             king.setMove(wasMoved);
         }
         return moves;
     }
+
+
 
     private boolean canCastle(King king, boolean kingSide) {
         int row = king.getRow();
@@ -384,7 +464,7 @@ public class Board {
         Piece captured = board[toRow][toCol];
 
         // Save current state
-        MoveSnapshot snapshot = new MoveSnapshot(piece, captured, fromRow, fromCol, toRow, toCol);
+        MoveSnapshot snapshot = new MoveSnapshot(piece, captured, fromRow, fromCol, toRow, toCol, false, false);
 
         // Perform simulated move
         board[toRow][toCol] = piece;
@@ -394,8 +474,6 @@ public class Board {
 
         return snapshot;
     }
-
-
 
 
 
@@ -415,18 +493,81 @@ public class Board {
         return legalMoves;
     }
 
+
+
     public void undoMove(MoveSnapshot snapshot) {
+        if (snapshot == null || snapshot.movedPiece == null) {
+            System.out.println("Invalid snapshot or moved piece");
+            return;
+        }
+
         Piece movingPiece = snapshot.movedPiece;
         Piece capturedPiece = snapshot.capturedPiece;
+        int fromRow = snapshot.fromRow;
+        int fromCol = snapshot.fromCol;
+        int toRow = snapshot.toRow;
+        int toCol = snapshot.toCol;
 
-        // Restore piece positions
-        board[snapshot.fromRow][snapshot.fromCol] = movingPiece;
-        board[snapshot.toRow][snapshot.toCol] = capturedPiece;
+        // Restore board state
+        board[fromRow][fromCol] = movingPiece;
+        board[toRow][toCol] = capturedPiece;
+        movingPiece.setRow(fromRow);
+        movingPiece.setCol(fromCol);
 
-        // Restore position of moving piece
-        movingPiece.setRow(snapshot.fromRow);
-        movingPiece.setCol(snapshot.fromCol);
+        // Restore King position if moved
+        if (movingPiece instanceof King) {
+            updateKingPosition((King) movingPiece, fromRow, fromCol);
+        }
 
+        // Restore piece List for captured piece
+        if (capturedPiece != null) {
+            List<Piece> opponentPiece = snapshot.whiteTurnBeforeMove ? blackPieces : whitePieces;
+            opponentPiece.add(capturedPiece);
+        }
+
+        // Restore first-move status
+        if (snapshot.movedPieceFirstMove) {
+            switch (movingPiece) {
+                case Pawn pawn -> pawn.setMove(false);
+                case King king -> king.setMove(false);
+                case Rook rook -> rook.setMove(false);
+                default -> {
+                }
+            }
+        }
+
+        // Handle special move
+        if (movingPiece instanceof King && Math.abs(toCol - fromCol) == 2) {
+            undoCastling(fromRow, fromCol, toRow);
+        }
+    }
+
+    private void undoCastling(int row, int kingFromCol, int kingToCol) {
+        int rookFromCol = kingToCol > kingFromCol ? 7 : 0;
+        int rookToCol = kingToCol > kingFromCol ? kingToCol - 1 : kingToCol + 1;
+        Piece rook = board[row][rookToCol];
+        if (rook instanceof Rook) {
+            board[row][rookToCol] = null;
+            board[row][rookFromCol] = rook;
+            rook.setCol(rookFromCol);
+            ((Rook) rook).setMove(false);
+            if (rook.isWhite()) whitePieces.add(rook);
+            else blackPieces.add(rook);
+        }
+    }
+
+
+
+    private void updateKingPosition(King king, int row, int col) {
+        if (king.isWhite()) {
+            whiteKingRow = row;
+            whiteKingCol = col;
+        }
+
+        else {
+            blackKingRow = row;
+            blackKingCol = col;
+        }
     }
 
 
@@ -514,6 +655,10 @@ public class Board {
 
     public boolean isWhiteTurn() {
         return whiteTurn;
+    }
+
+    public void setWhiteTurn(boolean whiteTurn) {
+        this.whiteTurn = whiteTurn;
     }
 
     public boolean isAITurn() {
