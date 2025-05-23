@@ -18,4 +18,6 @@ public class Knight extends Piece {
     public int getValue() {
         return 3;
     }
+
+
 }

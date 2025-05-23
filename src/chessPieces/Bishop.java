@@ -43,6 +43,7 @@ public class Bishop extends Piece {
         return null;  // No blocking piece
     }
 
+
     @Override
     public int getValue() {
         return 3;
