@@ -2,13 +2,7 @@ package ai;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Optimized TranspositionTable for chess AI.
- * - Uses ConcurrentHashMap for thread safety (future-proofing for parallel search).
- * - TTEntry is immutable for safety and efficiency.
- * - Uses static final constants for flag values.
- * - get/put/contains methods are inlined for clarity.
- */
+
 public class TranspositionTable {
     // Thread-safe for possible parallel search, and usually faster than HashMap for read-heavy usage
     private final ConcurrentHashMap<Long, TTEntry> table = new ConcurrentHashMap<>(1 << 16);

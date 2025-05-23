@@ -5,12 +5,7 @@ import chessPieces.Piece;
 
 import static utilz.Constants.getType;
 
-/**
- * Zobrist hashing for chess positions.
- * - Fast position hashing for transposition tables and repetition detection.
- * - Uses fixed seed for reproducibility.
- * - Optimized for minimal overhead.
- */
+
 public class Zobrist {
     // [color][pieceType][squareIndex], color: 0=white, 1=black, pieceType: 0-5 (P,N,B,R,Q,K)
     private static final long[][][] PIECE_HASH = new long[2][6][64];

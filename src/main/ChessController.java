@@ -1,25 +1,27 @@
 package main;
 
+import chessPieces.*;
 import javafx.animation.FadeTransition;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.Scene;
 import javafx.scene.Node;
+import utilz.LoadImage;
 import utilz.MoveSnapshot;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 
-/**
- * The ChessController class handles UI input, event handling, and manages synchronization between the user,
- * the game logic, and the AI. It does not implement any chess logic itself.
- */
+
 public class ChessController {
 
     @FXML private Text player1Name, player2Name, botName;
@@ -36,6 +38,8 @@ public class ChessController {
     @FXML private AnchorPane blackPieceWin, blackPieceLoose, whitePieceWin, whitePieceLoose;
     @FXML private Text checkMateBlack, checkMateWhite;
     @FXML private AnchorPane boardGameChess;
+    @FXML
+    private AnchorPane promotionChess;
 
     private Board board;
     private int selectedTimeSeconds = 600;
@@ -51,6 +55,11 @@ public class ChessController {
     private final Stack<Integer> blackTimeHistory = new Stack<>();
     private final Stack<Integer> whiteTimeHistory = new Stack<>();
 
+
+    private Pawn promotingPawn;
+    private int promotionRow;
+    private int promotionCol;
+
     public void setGame(Game game) {
         this.game = game;
     }
@@ -64,6 +73,7 @@ public class ChessController {
         initializeBoardInteraction();
         initializeNotificationWinPage();
         initializeUndoButton();
+        initializePromotionUI();
         initializeRestartButton();
         initializeSurrenderButton();
         board.draw(boardGameChess);
@@ -78,6 +88,96 @@ public class ChessController {
             });
         }
     }
+
+    private void initializePromotionUI() {
+        // Hide the promotion panel initially
+        promotionChess.setVisible(false);
+
+        // Add the promotion pieces for selection
+        promotionChess.getChildren().clear();
+
+        // Create promotion buttons
+        String[] pieceTypes = {"q", "r", "n", "b"}; // Queen, Rook, Knight, Bishop
+
+        for (int i = 0; i < pieceTypes.length; i++) {
+            final String pieceType = pieceTypes[i];
+            ImageView pieceImage = new ImageView();
+            pieceImage.setFitWidth(70);
+            pieceImage.setFitHeight(70);
+
+            // Position in a row
+            pieceImage.setLayoutX(20 + i * 70);
+            pieceImage.setLayoutY(10);
+
+            // Add click event
+            pieceImage.setOnMouseClicked(event -> {
+                if (promotingPawn != null) {
+                    promotePawn(pieceType);
+                }
+            });
+
+            promotionChess.getChildren().add(pieceImage);
+        }
+
+        // Add background rectangle
+        Rectangle background = new Rectangle();
+        background.setWidth(320);
+        background.setHeight(90);
+        background.setFill(Color.rgb(200, 200, 200, 0.9));
+        background.setArcWidth(15);
+        background.setArcHeight(15);
+        background.setStroke(Color.BLACK);
+        background.setStrokeWidth(2);
+        promotionChess.getChildren().add(0, background);
+    }
+
+    private void promotePawn(String pieceType) {
+        if (promotingPawn == null) return;
+
+        Piece newPiece = null;
+        boolean isWhite = promotingPawn.isWhite();
+
+        // Create the new piece based on selection
+        switch (pieceType) {
+            case "q":
+                newPiece = new Queen(promotionCol, promotionRow, isWhite);
+                break;
+            case "r":
+                newPiece = new Rook(promotionCol, promotionRow, isWhite);
+                break;
+            case "n":
+                newPiece = new Knight(promotionCol, promotionRow, isWhite);
+                break;
+            case "b":
+                newPiece = new Bishop(promotionCol, promotionRow, isWhite);
+                break;
+        }
+
+        if (newPiece != null) {
+            // Replace the pawn with the new piece
+            board.getBoard()[promotionRow][promotionCol] = newPiece;
+
+            // Hide the promotion dialog
+            promotionChess.setVisible(false);
+
+            // Re-enable board interaction
+            boardGameChess.setDisable(false);
+
+            // Reset promotion state
+            promotingPawn = null;
+
+            // Redraw the board
+            redraw();
+
+            // Check if this promotion causes a checkmate
+            boolean opponentInCheckmate = board.isCheckmate(!isWhite);
+            if (opponentInCheckmate) {
+                handleCheckmate(isWhite);
+            }
+        }
+    }
+
+
 
     public void addMoveSnapshot(MoveSnapshot snapshot) {
         moveHistory.push(snapshot);
@@ -415,4 +515,46 @@ public class ChessController {
     }
 
     public boolean isGameEnded() { return gameEnded; }
+
+    public void showPromotionDialog(Pawn pawn) {
+        promotingPawn = pawn;
+        promotionRow = pawn.getRow();
+        promotionCol = pawn.getCol();
+
+        // Determine if white or black pieces should be shown
+        boolean isWhite = pawn.isWhite();
+
+        // Update piece images based on color
+        for (int i = 0; i < 4; i++) {
+            ImageView pieceImage = (ImageView) promotionChess.getChildren().get(i + 1); // +1 to skip background
+            String pieceType = "";
+            switch (i) {
+                case 0: pieceType = "q"; break; // Queen
+                case 1: pieceType = "r"; break; // Rook
+                case 2: pieceType = "n"; break; // Knight
+                case 3: pieceType = "b"; break; // Bishop
+            }
+
+            // Load appropriate image
+            Image image = LoadImage.GetPieceImage(isWhite, pieceType);
+            pieceImage.setImage(image);
+        }
+
+        // Position the dialog near the pawn
+        int x = promotionCol * Game.GAME_TILES;
+        int y = promotionRow * Game.GAME_TILES;
+
+        // Ensure dialog stays within board boundaries
+        x = Math.max(100, Math.min(x,(int)boardGameChess.getWidth() - 350));
+        y = Math.max(100, Math.min(y, (int)boardGameChess.getHeight() - 100));
+
+        promotionChess.setLayoutX(x);
+        promotionChess.setLayoutY(y);
+
+        // Show the promotion dialog
+        promotionChess.setVisible(true);
+
+        // Disable board interaction while promoting
+        boardGameChess.setDisable(true);
+    }
 }

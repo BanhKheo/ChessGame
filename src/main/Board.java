@@ -57,7 +57,7 @@ public class Board {
 
         int col = x / Game.GAME_TILES;
         int row = y / Game.GAME_TILES;
-        if (col < 0 || col >= 8 || row < 0 || row >= 8) return;
+        if (!isOnBoard(row, col)) return;
 
         Piece clickedPiece = board[row][col];
 
@@ -75,6 +75,10 @@ public class Board {
                 deselectPiece();
             }
         }
+    }
+
+    private boolean isOnBoard(int row, int col) {
+        return row >= 0 && row < 8 && col >= 0 && col < 8;
     }
 
     private void selectPiece(Piece piece) {
@@ -116,6 +120,10 @@ public class Board {
             updateKingPosition(king, row, col);
         }
 
+        if(piece instanceof Pawn)
+        {
+            checkPawnPromotion((Pawn) piece);
+        }
         if (isCheckmate(!whiteTurn) && chessController != null) chessController.handleCheckmate(whiteTurn);
 
         whiteTurn = !whiteTurn;
@@ -123,6 +131,22 @@ public class Board {
 
         if (isAITurn()) performAIMove();
         else isPlayerMoving = true;
+    }
+
+    private void checkPawnPromotion(Pawn pawn) {
+        int row = pawn.getRow();
+        boolean isWhite = pawn.isWhite();
+
+        if ((isWhite && row == 0) || (!isWhite && row == 7)) {
+            // Instead of automatically promoting to Queen, show dialog
+            if (chessController != null) {
+                chessController.showPromotionDialog(pawn);
+            } else {
+                // Fallback to queen if no controller available
+                Piece promotedPiece = new Queen(pawn.getCol(), row, isWhite);
+                board[row][pawn.getCol()] = promotedPiece;
+            }
+        }
     }
 
     private void makeMove(Piece piece, int fromRow, int fromCol, int toRow, int toCol) {
@@ -154,6 +178,10 @@ public class Board {
                 Platform.runLater(() -> {
                     if (bestMove != null) {
                         synchronized (this) {
+                            if (!isOnBoard(bestMove.fromRow, bestMove.fromCol) || !isOnBoard(bestMove.toRow, bestMove.toCol)) {
+                                if (chessController != null) chessController.showBotThinking(false);
+                                return;
+                            }
                             Piece aiPiece = getPieceAt(bestMove.fromRow, bestMove.fromCol);
                             if (aiPiece != null) {
                                 makeMove(aiPiece, bestMove.fromRow, bestMove.fromCol, bestMove.toRow, bestMove.toCol);
@@ -190,6 +218,7 @@ public class Board {
     }
 
     private void moveRookForCastling(int row, int rookCol, int targetCol) {
+        if (!isOnBoard(row, rookCol) || !isOnBoard(row, targetCol)) return;
         Piece rook = board[row][rookCol];
         if (rook instanceof Rook) {
             board[row][rookCol] = null;
@@ -253,6 +282,7 @@ public class Board {
     }
 
     private boolean legalMove(Piece piece, int col, int row) {
+        if (!isOnBoard(row, col)) return false;
         if (!piece.logicMove(piece.getRow(), piece.getCol(), row, col, board)) return false;
         if (isBlocked(piece, row, col)) return false;
         Piece targetPiece = board[row][col];
@@ -260,9 +290,11 @@ public class Board {
     }
 
     private boolean isBlocked(Piece piece, int newRow, int newCol) {
+        if (!isOnBoard(newRow, newCol)) return true;
         int[] blockedPos = piece.getBlockPieces(this, newRow, newCol);
         if (blockedPos != null) {
             for (int i = 1; i < blockedPos.length; i++) {
+                if (!isOnBoard(blockedPos[0], blockedPos[i])) continue;
                 if (board[blockedPos[0]][blockedPos[i]] != null) return true;
             }
             return false;
@@ -271,6 +303,7 @@ public class Board {
             int oldRow = piece.getRow(), oldCol = piece.getCol();
             int rowStep = Integer.compare(newRow, oldRow), colStep = Integer.compare(newCol, oldCol);
             for (int r = oldRow + rowStep, c = oldCol + colStep; r != newRow || c != newCol; r += rowStep, c += colStep) {
+                if (!isOnBoard(r, c)) break;
                 if (board[r][c] != null) return true;
             }
         }
@@ -315,14 +348,17 @@ public class Board {
     private boolean canCastle(King king, boolean kingSide) {
         int row = king.getRow(), col = king.getCol();
         int rookCol = kingSide ? 7 : 0;
+        if (!isOnBoard(row, rookCol)) return false;
         Piece rook = board[row][rookCol];
         if (!(rook instanceof Rook) || ((Rook) rook).isMoved()) return false;
         int step = kingSide ? 1 : -1;
         int clearTill = kingSide ? 7 : 0;
         for (int c = col + step; kingSide ? c < clearTill : c > clearTill; c += step) {
+            if (!isOnBoard(row, c)) return false;
             if (board[row][c] != null) return false;
         }
         for (int c = col; kingSide ? c <= col + 2 : c >= col - 2; c += step) {
+            if (!isOnBoard(row, c)) return false;
             if (isSquareUnderAttack(row, c, !king.isWhite())) return false;
         }
         return true;
@@ -381,8 +417,7 @@ public class Board {
                 }
             }
         }
-        // ADD THIS CHECK:
-        if (kingRow == -1 || kingCol == -1) return false; // or throw new IllegalStateException("King not found!");
+        if (!isOnBoard(kingRow, kingCol)) return false;
 
         for (int r = 0; r < 8; r++) {
             for (int c = 0; c < 8; c++) {
@@ -400,6 +435,9 @@ public class Board {
 
     public MoveSnapshot simulateMove(Piece piece, int toRow, int toCol) {
         int fromRow = piece.getRow(), fromCol = piece.getCol();
+        if (!isOnBoard(fromRow, fromCol) || !isOnBoard(toRow, toCol)) {
+            return null;
+        }
         Piece captured = board[toRow][toCol];
         MoveSnapshot snapshot = new MoveSnapshot(piece, captured, fromRow, fromCol, toRow, toCol, false, false);
         board[toRow][toCol] = piece;
@@ -411,9 +449,12 @@ public class Board {
 
     public void undoMove(MoveSnapshot snapshot) {
         if (snapshot == null || snapshot.movedPiece == null) return;
-        Piece movingPiece = snapshot.movedPiece, capturedPiece = snapshot.capturedPiece;
         int fromRow = snapshot.fromRow, fromCol = snapshot.fromCol;
         int toRow = snapshot.toRow, toCol = snapshot.toCol;
+
+        if (!isOnBoard(fromRow, fromCol) || !isOnBoard(toRow, toCol)) return;
+
+        Piece movingPiece = snapshot.movedPiece, capturedPiece = snapshot.capturedPiece;
 
         board[fromRow][fromCol] = movingPiece;
         board[toRow][toCol] = capturedPiece;
@@ -438,6 +479,7 @@ public class Board {
     private void undoCastling(int row, int kingFromCol, int kingToCol) {
         int rookFromCol = kingToCol > kingFromCol ? 7 : 0;
         int rookToCol = kingToCol > kingFromCol ? kingToCol - 1 : kingToCol + 1;
+        if (!isOnBoard(row, rookFromCol) || !isOnBoard(row, rookToCol)) return;
         Piece rook = board[row][rookToCol];
         if (rook instanceof Rook) {
             board[row][rookToCol] = null;
@@ -450,6 +492,7 @@ public class Board {
     }
 
     private void updateKingPosition(King king, int row, int col) {
+        if (!isOnBoard(row, col)) return;
         if (king.isWhite()) {
             whiteKingRow = row;
             whiteKingCol = col;
@@ -460,6 +503,7 @@ public class Board {
     }
 
     private boolean isSquareUnderAttack(int row, int col, boolean byWhite) {
+        if (!isOnBoard(row, col)) return false;
         for (int r = 0; r < 8; r++) {
             for (int c = 0; c < 8; c++) {
                 Piece piece = board[r][c];
@@ -474,7 +518,10 @@ public class Board {
         return false;
     }
 
-    public Piece getPieceAt(int row, int col) { return board[row][col]; }
+    public Piece getPieceAt(int row, int col) {
+        if (!isOnBoard(row, col)) return null;
+        return board[row][col];
+    }
     public Piece getSelectedPiece() { return selectedPiece; }
     public void setSelectedPiece(Piece piece) { this.selectedPiece = piece; }
     public List<int[]> getValidMoves() { return validMoves; }
@@ -487,13 +534,19 @@ public class Board {
 
     public void draw(AnchorPane boardGame) {
         boardGame.getChildren().clear();
-        for (int row = 0; row < 8; row++)
-            for (int col = 0; col < 8; col++)
-                if (board[row][col] != null)
-                    board[row][col].draw(boardGame);
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                Piece piece = board[row][col];
+                if (piece != null) {
+                    piece.draw(boardGame);
+                }
+            }
+        }
 
         if (selectedPiece != null && !validMoves.isEmpty()) {
             for (int[] move : validMoves) {
+                // Defensive: ensure valid move indices
+                if (move[0] < 0 || move[0] >= 8 || move[1] < 0 || move[1] >= 8) continue;
                 javafx.scene.shape.Circle circle = new javafx.scene.shape.Circle();
                 circle.setRadius(16);
                 circle.setCenterX(move[0] * Game.GAME_TILES + Game.GAME_TILES / 2);
