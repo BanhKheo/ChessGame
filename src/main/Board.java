@@ -433,18 +433,62 @@ public class Board {
         return false;
     }
 
+
     public MoveSnapshot simulateMove(Piece piece, int toRow, int toCol) {
         int fromRow = piece.getRow(), fromCol = piece.getCol();
         if (!isOnBoard(fromRow, fromCol) || !isOnBoard(toRow, toCol)) {
             return null;
         }
+
+        boolean movedPieceFirstMove = false;
+        if (piece instanceof chessPieces.Pawn pawn) movedPieceFirstMove = !pawn.isMoved();
+        if (piece instanceof chessPieces.King king) movedPieceFirstMove = !king.isMoved();
+        if (piece instanceof chessPieces.Rook rook) movedPieceFirstMove = !rook.isMoved();
+
         Piece captured = board[toRow][toCol];
-        MoveSnapshot snapshot = new MoveSnapshot(piece, captured, fromRow, fromCol, toRow, toCol, false, false);
+        boolean whiteTurnBeforeMove = isWhiteTurn(); // Save turn info if you use it
+
+        // Castling detection
+        int castlingRookFromCol = -1, castlingRookToCol = -1;
+        if (piece instanceof chessPieces.King && Math.abs(toCol - fromCol) == 2) {
+            // Castling move
+            int rookRow = fromRow;
+            if (toCol == 6) { // king-side
+                castlingRookFromCol = 7;
+                castlingRookToCol = 5;
+                Piece rook = board[rookRow][7];
+                board[rookRow][5] = rook;
+                board[rookRow][7] = null;
+                if (rook != null) rook.setCol(5);
+            } else if (toCol == 2) { // queen-side
+                castlingRookFromCol = 0;
+                castlingRookToCol = 3;
+                Piece rook = board[rookRow][0];
+                board[rookRow][3] = rook;
+                board[rookRow][0] = null;
+                if (rook != null) rook.setCol(3);
+            }
+        }
+
+        // Move the piece
         board[toRow][toCol] = piece;
         board[fromRow][fromCol] = null;
         piece.setRow(toRow);
         piece.setCol(toCol);
-        return snapshot;
+
+        // Remove captured piece from active list
+        if (captured != null) {
+            List<Piece> opponentPieces = piece.isWhite() ? blackPieces : whitePieces;
+            opponentPieces.remove(captured);
+        }
+
+        return new MoveSnapshot(
+                piece, captured,
+                fromRow, fromCol, toRow, toCol,
+                whiteTurnBeforeMove, movedPieceFirstMove,
+                false, // capturedPieceFirstMove (extend as needed)
+                castlingRookFromCol, castlingRookToCol
+        );
     }
 
     public void undoMove(MoveSnapshot snapshot) {
@@ -456,25 +500,35 @@ public class Board {
 
         Piece movingPiece = snapshot.movedPiece, capturedPiece = snapshot.capturedPiece;
 
+        // Undo castling if it was a castling move
+        if (snapshot.isCastlingMove()) {
+            int rookRow = fromRow;
+            Piece rook = board[rookRow][snapshot.castlingRookToCol];
+            board[rookRow][snapshot.castlingRookFromCol] = rook;
+            if (rook != null) rook.setCol(snapshot.castlingRookFromCol);
+            board[rookRow][snapshot.castlingRookToCol] = null;
+        }
+
+        // Restore the pieces
         board[fromRow][fromCol] = movingPiece;
         board[toRow][toCol] = capturedPiece;
         movingPiece.setRow(fromRow);
         movingPiece.setCol(fromCol);
 
-        if (movingPiece instanceof King) updateKingPosition((King) movingPiece, fromRow, fromCol);
-        if (capturedPiece != null) {
-            List<Piece> opponentPiece = snapshot.whiteTurnBeforeMove ? blackPieces : whitePieces;
-            opponentPiece.add(capturedPiece);
-        }
-
+        // Restore first-move status if needed
         if (snapshot.movedPieceFirstMove) {
-            if (movingPiece instanceof Pawn pawn) pawn.setMove(false);
-            else if (movingPiece instanceof King king) king.setMove(false);
-            else if (movingPiece instanceof Rook rook) rook.setMove(false);
+            if (movingPiece instanceof chessPieces.Pawn pawn) pawn.setMove(false);
+            if (movingPiece instanceof chessPieces.King king) king.setMove(false);
+            if (movingPiece instanceof chessPieces.Rook rook) rook.setMove(false);
         }
 
-        if (movingPiece instanceof King && Math.abs(toCol - fromCol) == 2) undoCastling(fromRow, fromCol, toRow);
+        // Restore captured piece to active list
+        if (capturedPiece != null) {
+            List<Piece> opponentPieces = movingPiece.isWhite() ? blackPieces : whitePieces;
+            opponentPieces.add(capturedPiece);
+        }
     }
+
 
     private void undoCastling(int row, int kingFromCol, int kingToCol) {
         int rookFromCol = kingToCol > kingFromCol ? 7 : 0;
