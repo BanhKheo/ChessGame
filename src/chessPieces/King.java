@@ -23,8 +23,7 @@ public class King extends Piece {
             if (newCol == oldCol + 2) {
                 Piece rook = board[oldRow][7];
                 if (rook instanceof Rook && !((Rook) rook).isMoved()) {
-                    if (board[oldRow][5] == null && board[oldRow][6] == null &&
-                            !isSquareUnderAttack(board, newCol, newCol , isWhite  )) {
+                    if (board[oldRow][5] == null && board[oldRow][6] == null) {
                         return true;
                     }
                 }
@@ -42,19 +41,11 @@ public class King extends Piece {
         }
 
 
-        if (rowDiff <= 1 && colDiff <= 1 && (rowDiff + colDiff) > 0) {
-            Piece target = board[newRow][newCol];
-            //Only check opponent piece
-            if ((target == null || target.isWhite != this.isWhite) &&
-                    !isSquareUnderAttack(board, newRow, newCol, isWhite)) { //Check whether the target position is underattack of any pieces
-                return true;
-            }
-        }
-        return false;
+        return rowDiff <= 1 && colDiff <= 1 && (rowDiff + colDiff) > 0;
     }
 
     @Override
-    public int[] getBlockPieces(Board board, int newRow, int newCol) {
+    public int[] getBlockPieces(Piece[][] board, int newRow, int newCol) {
         int oldRow = this.getRow();
         int oldCol = this.getCol();
 
@@ -68,6 +59,12 @@ public class King extends Piece {
         return null;
     }
 
+    @Override
+    public King copy() {
+        King clone = new King(this.getCol(), this.getRow(), this.isWhite());
+        clone.setMove(this.isMoved());
+        return clone;
+    }
 
 
     @Override

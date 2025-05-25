@@ -20,4 +20,10 @@ public class Knight extends Piece {
     }
 
 
+    @Override
+    public Knight copy() {
+        return new Knight(this.getCol(), this.getRow(), this.isWhite());
+    }
+
+
 }

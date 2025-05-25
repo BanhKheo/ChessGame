@@ -7,16 +7,10 @@ import utilz.MoveSnapshot;
 import ai.ChessAI;
 import static utilz.Constants.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * The Board class encapsulates the state and logic of the chess game, including interaction with the AI.
- * It is UI-agnostic: it exposes methods for interacting with the game, but does not handle any UI code.
- */
 public class Board {
 
     private final Piece[][] board = new Piece[8][8];
@@ -39,26 +33,25 @@ public class Board {
         initializePieces();
     }
 
+    private Board(boolean skipInit) {}
+
+    // --- SETTERS / GETTERS ---
+
     public void setChessController(ChessController controller) {
         this.chessController = controller;
     }
 
     public void setAIEnabled(boolean enabled) {
         this.isAIEnabled = enabled;
-        this.ai = enabled ? new ChessAI(false) : null; // AI plays as black if enabled
+        this.ai = enabled ? new ChessAI(false) : null;
     }
 
-    /**
-     * Handles selection and move logic for a piece based on board coordinates.
-     * Should only be called by the UI/controller after confirming it's the user's turn.
-     */
+    // --- UI AND MOVE HANDLING ---
+
     public void handleSelectedPiece(int x, int y) {
-        if (isAITurn()) return; // Prevent user actions when it's AI's turn
-
-        int col = x / Game.GAME_TILES;
-        int row = y / Game.GAME_TILES;
+        if (isAITurn()) return;
+        int col = x / Game.GAME_TILES, row = y / Game.GAME_TILES;
         if (!isOnBoard(row, col)) return;
-
         Piece clickedPiece = board[row][col];
 
         if (selectedPiece == null) {
@@ -94,18 +87,11 @@ public class Board {
     }
 
     private boolean isValidMove(int col, int row) {
-        for (int[] move : validMoves) {
-            if (move[0] == col && move[1] == row) return true;
-        }
-        return false;
+        return validMoves.stream().anyMatch(move -> move[0] == col && move[1] == row);
     }
 
-    /**
-     * Actually perform a move for the given piece.
-     */
     private void movePiece(Piece piece, int col, int row) {
         if (!legalMove(piece, col, row) || !isPlayerMoving) return;
-
         isPlayerMoving = false;
         int oldRow = piece.getRow(), oldCol = piece.getCol();
         boolean wasFirstMove = recordFirstMoveStatus(piece);
@@ -119,11 +105,8 @@ public class Board {
             handleCastling(king, oldCol, row, col);
             updateKingPosition(king, row, col);
         }
+        if (piece instanceof Pawn) checkPawnPromotion((Pawn) piece);
 
-        if(piece instanceof Pawn)
-        {
-            checkPawnPromotion((Pawn) piece);
-        }
         if (isCheckmate(!whiteTurn) && chessController != null) chessController.handleCheckmate(whiteTurn);
 
         whiteTurn = !whiteTurn;
@@ -136,13 +119,10 @@ public class Board {
     private void checkPawnPromotion(Pawn pawn) {
         int row = pawn.getRow();
         boolean isWhite = pawn.isWhite();
-
         if ((isWhite && row == 0) || (!isWhite && row == 7)) {
-            // Instead of automatically promoting to Queen, show dialog
             if (chessController != null) {
                 chessController.showPromotionDialog(pawn);
             } else {
-                // Fallback to queen if no controller available
                 Piece promotedPiece = new Queen(pawn.getCol(), row, isWhite);
                 board[row][pawn.getCol()] = promotedPiece;
             }
@@ -170,27 +150,29 @@ public class Board {
         else if (piece instanceof Rook rook) rook.setMove(true);
     }
 
+    // --- AI MOVE LOGIC (OPTIMIZED) ---
+
     private void performAIMove() {
         if (chessController != null) chessController.showBotThinking(true);
         aiExecutor.submit(() -> {
             try {
-                ChessAI.Move bestMove = ai.getBestMove(this, 3);
+                Board aiBoard = this.deepCopy();
+                ChessAI.Move bestMove = ai.getBestMove(aiBoard, 3);
                 Platform.runLater(() -> {
                     if (bestMove != null) {
-                        synchronized (this) {
-                            if (!isOnBoard(bestMove.fromRow, bestMove.fromCol) || !isOnBoard(bestMove.toRow, bestMove.toCol)) {
-                                if (chessController != null) chessController.showBotThinking(false);
-                                return;
-                            }
-                            Piece aiPiece = getPieceAt(bestMove.fromRow, bestMove.fromCol);
-                            if (aiPiece != null) {
-                                makeMove(aiPiece, bestMove.fromRow, bestMove.fromCol, bestMove.toRow, bestMove.toCol);
-                                whiteTurn = true;
-                                isPlayerMoving = true;
-                                if (chessController != null) {
-                                    chessController.redraw();
-                                    if (isCheckmate(true)) chessController.handleCheckmate(whiteTurn);
-                                }
+                        // Validate move on current board state, not on aiBoard
+                        if (!isOnBoard(bestMove.fromRow, bestMove.fromCol) || !isOnBoard(bestMove.toRow, bestMove.toCol)) {
+                            if (chessController != null) chessController.showBotThinking(false);
+                            return;
+                        }
+                        Piece aiPiece = getPieceAt(bestMove.fromRow, bestMove.fromCol);
+                        if (aiPiece != null && !aiPiece.isWhite()) { // Black AI only
+                            makeMove(aiPiece, bestMove.fromRow, bestMove.fromCol, bestMove.toRow, bestMove.toCol);
+                            whiteTurn = true;
+                            isPlayerMoving = true;
+                            if (chessController != null) {
+                                chessController.redraw();
+                                if (isCheckmate(true)) chessController.handleCheckmate(whiteTurn);
                             }
                         }
                     }
@@ -208,9 +190,7 @@ public class Board {
         });
     }
 
-    public void shutdown() {
-        aiExecutor.shutdown();
-    }
+    // --- CASTLING ---
 
     private void handleCastling(King king, int oldCol, int row, int col) {
         if (col == oldCol + 2) moveRookForCastling(row, 7, col - 1);
@@ -243,6 +223,8 @@ public class Board {
         ai = isAIEnabled ? new ChessAI(false) : null;
         if (chessController != null) chessController.redraw();
     }
+
+    // --- PIECE INITIALIZATION ---
 
     private void initializePieces() {
         int[][] initialBoard = {
@@ -281,6 +263,10 @@ public class Board {
         }
     }
 
+    // --- MOVE VALIDATION ---
+
+
+
     private boolean legalMove(Piece piece, int col, int row) {
         if (!isOnBoard(row, col)) return false;
         if (!piece.logicMove(piece.getRow(), piece.getCol(), row, col, board)) return false;
@@ -291,7 +277,7 @@ public class Board {
 
     private boolean isBlocked(Piece piece, int newRow, int newCol) {
         if (!isOnBoard(newRow, newCol)) return true;
-        int[] blockedPos = piece.getBlockPieces(this, newRow, newCol);
+        int[] blockedPos = piece.getBlockPieces(board, newRow, newCol);
         if (blockedPos != null) {
             for (int i = 1; i < blockedPos.length; i++) {
                 if (!isOnBoard(blockedPos[0], blockedPos[i])) continue;
@@ -299,35 +285,29 @@ public class Board {
             }
             return false;
         }
-        if (piece instanceof Rook || piece instanceof Bishop || piece instanceof Queen) {
-            int oldRow = piece.getRow(), oldCol = piece.getCol();
-            int rowStep = Integer.compare(newRow, oldRow), colStep = Integer.compare(newCol, oldCol);
-            for (int r = oldRow + rowStep, c = oldCol + colStep; r != newRow || c != newCol; r += rowStep, c += colStep) {
-                if (!isOnBoard(r, c)) break;
-                if (board[r][c] != null) return true;
-            }
-        }
         return false;
     }
 
     private List<int[]> getValidMoves(Piece piece) {
         List<int[]> moves = new ArrayList<>();
+        int originalRow = piece.getRow(), originalCol = piece.getCol();
+
         boolean wasMoved = false;
         if (piece instanceof Pawn pawn) wasMoved = pawn.isMoved();
-        else if (piece instanceof King king) {
-            wasMoved = king.isMoved();
-            if (!king.isMoved() && !isKingInCheck(king.isWhite())) {
-                int row = king.getRow(), col = king.getCol();
-                if (canCastle(king, true)) moves.add(new int[]{col + 2, row});
-                if (canCastle(king, false)) moves.add(new int[]{col - 2, row});
-            }
+        else if (piece instanceof King king) wasMoved = king.isMoved();
+        else if (piece instanceof Rook rook) wasMoved = rook.isMoved();
+
+        if (piece instanceof King king && !king.isMoved() && !isKingInCheck(king.isWhite())) {
+            int row = king.getRow(), col = king.getCol();
+            if (canCastle(king, true)) moves.add(new int[]{col + 2, row});
+            if (canCastle(king, false)) moves.add(new int[]{col - 2, row});
         }
-        int originalRow = piece.getRow(), originalCol = piece.getCol();
-        Piece originalTarget;
+
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 if (!legalMove(piece, col, row) || isBlocked(piece, row, col)) continue;
-                originalTarget = board[row][col];
+
+                Piece originalTarget = board[row][col];
                 board[originalRow][originalCol] = null;
                 board[row][col] = piece;
                 piece.setRow(row);
@@ -337,28 +317,31 @@ public class Board {
                 board[row][col] = originalTarget;
                 piece.setRow(originalRow);
                 piece.setCol(originalCol);
+
                 if (kingSafe) moves.add(new int[]{col, row});
             }
         }
+
         if (piece instanceof Pawn pawn) pawn.setMove(wasMoved);
         else if (piece instanceof King king) king.setMove(wasMoved);
+        else if (piece instanceof Rook rook) rook.setMove(wasMoved);
+
         return moves;
     }
 
     private boolean canCastle(King king, boolean kingSide) {
+        if (king.isMoved() || isKingInCheck(king.isWhite())) return false;
         int row = king.getRow(), col = king.getCol();
         int rookCol = kingSide ? 7 : 0;
-        if (!isOnBoard(row, rookCol)) return false;
-        Piece rook = board[row][rookCol];
+        int kingTargetCol = kingSide ? 6 : 2;
+
+        Piece rook = isOnBoard(row, rookCol) ? board[row][rookCol] : null;
         if (!(rook instanceof Rook) || ((Rook) rook).isMoved()) return false;
         int step = kingSide ? 1 : -1;
-        int clearTill = kingSide ? 7 : 0;
-        for (int c = col + step; kingSide ? c < clearTill : c > clearTill; c += step) {
-            if (!isOnBoard(row, c)) return false;
+        for (int c = col + step; kingSide ? c < rookCol : c > rookCol; c += step) {
             if (board[row][c] != null) return false;
         }
-        for (int c = col; kingSide ? c <= col + 2 : c >= col - 2; c += step) {
-            if (!isOnBoard(row, c)) return false;
+        for (int c = col; kingSide ? c <= kingTargetCol : c >= kingTargetCol; c += step) {
             if (isSquareUnderAttack(row, c, !king.isWhite())) return false;
         }
         return true;
@@ -418,13 +401,12 @@ public class Board {
             }
         }
         if (!isOnBoard(kingRow, kingCol)) return false;
-
         for (int r = 0; r < 8; r++) {
             for (int c = 0; c < 8; c++) {
                 Piece enemy = board[r][c];
                 if (enemy != null && enemy.isWhite() != isWhitePlayer) {
                     if (enemy.logicMove(enemy.getRow(), enemy.getCol(), kingRow, kingCol, board)
-                            && enemy.getBlockPieces(this, kingRow, kingCol) == null) {
+                            && enemy.getBlockPieces(board, kingRow, kingCol) == null) {
                         return true;
                     }
                 }
@@ -433,34 +415,30 @@ public class Board {
         return false;
     }
 
+    // --- MOVE SIMULATION FOR AI ---
 
     public MoveSnapshot simulateMove(Piece piece, int toRow, int toCol) {
         int fromRow = piece.getRow(), fromCol = piece.getCol();
-        if (!isOnBoard(fromRow, fromCol) || !isOnBoard(toRow, toCol)) {
-            return null;
-        }
-
+        if (!isOnBoard(fromRow, fromCol) || !isOnBoard(toRow, toCol)) return null;
         boolean movedPieceFirstMove = false;
-        if (piece instanceof chessPieces.Pawn pawn) movedPieceFirstMove = !pawn.isMoved();
-        if (piece instanceof chessPieces.King king) movedPieceFirstMove = !king.isMoved();
-        if (piece instanceof chessPieces.Rook rook) movedPieceFirstMove = !rook.isMoved();
+        if (piece instanceof Pawn pawn) movedPieceFirstMove = !pawn.isMoved();
+        if (piece instanceof King king) movedPieceFirstMove = !king.isMoved();
+        if (piece instanceof Rook rook) movedPieceFirstMove = !rook.isMoved();
 
         Piece captured = board[toRow][toCol];
-        boolean whiteTurnBeforeMove = isWhiteTurn(); // Save turn info if you use it
+        boolean whiteTurnBeforeMove = isWhiteTurn();
 
-        // Castling detection
         int castlingRookFromCol = -1, castlingRookToCol = -1;
-        if (piece instanceof chessPieces.King && Math.abs(toCol - fromCol) == 2) {
-            // Castling move
+        if (piece instanceof King && Math.abs(toCol - fromCol) == 2) {
             int rookRow = fromRow;
-            if (toCol == 6) { // king-side
+            if (toCol == 6) {
                 castlingRookFromCol = 7;
                 castlingRookToCol = 5;
                 Piece rook = board[rookRow][7];
                 board[rookRow][5] = rook;
                 board[rookRow][7] = null;
                 if (rook != null) rook.setCol(5);
-            } else if (toCol == 2) { // queen-side
+            } else if (toCol == 2) {
                 castlingRookFromCol = 0;
                 castlingRookToCol = 3;
                 Piece rook = board[rookRow][0];
@@ -469,14 +447,11 @@ public class Board {
                 if (rook != null) rook.setCol(3);
             }
         }
-
-        // Move the piece
         board[toRow][toCol] = piece;
         board[fromRow][fromCol] = null;
         piece.setRow(toRow);
         piece.setCol(toCol);
 
-        // Remove captured piece from active list
         if (captured != null) {
             List<Piece> opponentPieces = piece.isWhite() ? blackPieces : whitePieces;
             opponentPieces.remove(captured);
@@ -486,7 +461,7 @@ public class Board {
                 piece, captured,
                 fromRow, fromCol, toRow, toCol,
                 whiteTurnBeforeMove, movedPieceFirstMove,
-                false, // capturedPieceFirstMove (extend as needed)
+                false,
                 castlingRookFromCol, castlingRookToCol
         );
     }
@@ -500,7 +475,6 @@ public class Board {
 
         Piece movingPiece = snapshot.movedPiece, capturedPiece = snapshot.capturedPiece;
 
-        // Undo castling if it was a castling move
         if (snapshot.isCastlingMove()) {
             int rookRow = fromRow;
             Piece rook = board[rookRow][snapshot.castlingRookToCol];
@@ -509,39 +483,20 @@ public class Board {
             board[rookRow][snapshot.castlingRookToCol] = null;
         }
 
-        // Restore the pieces
         board[fromRow][fromCol] = movingPiece;
         board[toRow][toCol] = capturedPiece;
         movingPiece.setRow(fromRow);
         movingPiece.setCol(fromCol);
 
-        // Restore first-move status if needed
         if (snapshot.movedPieceFirstMove) {
-            if (movingPiece instanceof chessPieces.Pawn pawn) pawn.setMove(false);
-            if (movingPiece instanceof chessPieces.King king) king.setMove(false);
-            if (movingPiece instanceof chessPieces.Rook rook) rook.setMove(false);
+            if (movingPiece instanceof Pawn pawn) pawn.setMove(false);
+            if (movingPiece instanceof King king) king.setMove(false);
+            if (movingPiece instanceof Rook rook) rook.setMove(false);
         }
 
-        // Restore captured piece to active list
         if (capturedPiece != null) {
             List<Piece> opponentPieces = movingPiece.isWhite() ? blackPieces : whitePieces;
             opponentPieces.add(capturedPiece);
-        }
-    }
-
-
-    private void undoCastling(int row, int kingFromCol, int kingToCol) {
-        int rookFromCol = kingToCol > kingFromCol ? 7 : 0;
-        int rookToCol = kingToCol > kingFromCol ? kingToCol - 1 : kingToCol + 1;
-        if (!isOnBoard(row, rookFromCol) || !isOnBoard(row, rookToCol)) return;
-        Piece rook = board[row][rookToCol];
-        if (rook instanceof Rook) {
-            board[row][rookToCol] = null;
-            board[row][rookFromCol] = rook;
-            rook.setCol(rookFromCol);
-            ((Rook) rook).setMove(false);
-            if (rook.isWhite()) whitePieces.add(rook);
-            else blackPieces.add(rook);
         }
     }
 
@@ -562,19 +517,17 @@ public class Board {
             for (int c = 0; c < 8; c++) {
                 Piece piece = board[r][c];
                 if (piece != null && piece.isWhite() == byWhite) {
-                    if (piece.logicMove(piece.getRow(), piece.getCol(), row, col, board)
-                            && !isBlocked(piece, row, col)) {
-                        return true;
-                    }
+                    if (legalMove(piece, row, col)) return true;
                 }
             }
         }
         return false;
     }
 
+    // --- GETTERS FOR UI/AI ---
+
     public Piece getPieceAt(int row, int col) {
-        if (!isOnBoard(row, col)) return null;
-        return board[row][col];
+        return isOnBoard(row, col) ? board[row][col] : null;
     }
     public Piece getSelectedPiece() { return selectedPiece; }
     public void setSelectedPiece(Piece piece) { this.selectedPiece = piece; }
@@ -586,23 +539,45 @@ public class Board {
     public boolean isGameEnded() { return chessController != null && chessController.isGameEnded(); }
     public Piece[][] getBoard() { return board; }
 
+    // --- DEEP COPY ---
+
+    public Board deepCopy() {
+        Board copy = new Board(true);
+        // Copy pieces
+        for (int r = 0; r < 8; r++) {
+            for (int c = 0; c < 8; c++) {
+                Piece p = this.board[r][c];
+                if (p != null) {
+                    Piece pCopy = p.copy();
+                    copy.board[r][c] = pCopy;
+                    if (p.isWhite()) copy.whitePieces.add(pCopy);
+                    else copy.blackPieces.add(pCopy);
+                    if (pCopy instanceof King) copy.updateKingPosition((King) pCopy, r, c);
+                }
+            }
+        }
+        copy.whiteTurn = this.whiteTurn;
+        copy.isPlayerMoving = this.isPlayerMoving;
+        copy.selectedPiece = null;
+        copy.validMoves = Collections.emptyList();
+        copy.isAIEnabled = false;
+        return copy;
+    }
+
+    // --- DRAW UI ---
+
     public void draw(AnchorPane boardGame) {
         boardGame.getChildren().clear();
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 Piece piece = board[row][col];
-                if (piece != null) {
-                    piece.draw(boardGame);
-                }
+                if (piece != null) piece.draw(boardGame);
             }
         }
-
         if (selectedPiece != null && !validMoves.isEmpty()) {
             for (int[] move : validMoves) {
-                // Defensive: ensure valid move indices
                 if (move[0] < 0 || move[0] >= 8 || move[1] < 0 || move[1] >= 8) continue;
-                javafx.scene.shape.Circle circle = new javafx.scene.shape.Circle();
-                circle.setRadius(16);
+                javafx.scene.shape.Circle circle = new javafx.scene.shape.Circle(16);
                 circle.setCenterX(move[0] * Game.GAME_TILES + Game.GAME_TILES / 2);
                 circle.setCenterY(move[1] * Game.GAME_TILES + Game.GAME_TILES / 2);
                 circle.setFill(javafx.scene.paint.Color.rgb(169, 169, 169, 0.6));

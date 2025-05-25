@@ -11,7 +11,7 @@
    <children>
       <ImageView fitHeight="331.0" fitWidth="774.0" layoutY="169.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@res/StartingGame.png" />
+            <Image url="@../img/StartingGame.png" />
          </image>
       </ImageView>
       <Text fill="#069525" layoutX="194.0" layoutY="69.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Mini Chess">

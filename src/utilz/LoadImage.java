@@ -41,7 +41,7 @@ public class LoadImage {
 
     public static Image GetPieceImage(boolean isWhite , String p) {
         BufferedImage img = null;
-        InputStream is = LoadImage.class.getResourceAsStream("/res/" + getFileName( isWhite , p)+".png");
+        InputStream is = LoadImage.class.getResourceAsStream("/res/img/" + getFileName( isWhite , p)+".png");
         try {
             img = ImageIO.read(is);
 

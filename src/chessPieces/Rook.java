@@ -20,7 +20,7 @@ public class Rook extends Piece {
     }
 
     @Override
-    public int[] getBlockPieces(Board board, int newRow, int newCol) {
+    public int[] getBlockPieces(Piece[][] board, int newRow, int newCol) {
         int oldRow = this.getRow();
         int oldCol = this.getCol();
 
@@ -29,7 +29,7 @@ public class Rook extends Piece {
             int step = (newRow > oldRow) ? 1 : -1;
             int r = oldRow + step;
             while (r != newRow) {  // Loop until reaching target row
-                if (board.getPieceAt(r, oldCol) != null) {  // Corrected row-col order
+                if ( board[r][oldCol] != null) {  // Corrected row-col order
                     return new int[]{r, oldCol}; // Blocked piece found
                 }
                 r += step;
@@ -41,7 +41,7 @@ public class Rook extends Piece {
             int step = (newCol > oldCol) ? 1 : -1;
             int c = oldCol + step;
             while (c != newCol) {  // Loop until reaching target column
-                if (board.getPieceAt(oldRow, c) != null) {  // Corrected row-col order
+                if (board[oldRow][c] != null) {  // Corrected row-col order
                     return new int[]{oldRow, c}; // Blocked piece found
                 }
                 c += step;
@@ -62,6 +62,13 @@ public class Rook extends Piece {
     @Override
     public int getValue() {
         return 5;
+    }
+
+    @Override
+    public Rook copy() {
+        Rook clone = new Rook(this.getCol(), this.getRow(), this.isWhite());
+        clone.setMove(this.isMoved());
+        return clone;
     }
 
 

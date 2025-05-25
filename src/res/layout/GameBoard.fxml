@@ -17,7 +17,7 @@
          <children>
             <ImageView fitHeight="35.0" fitWidth="35.0" layoutX="10.0" layoutY="3.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@res/image1.png" />
+                  <Image url="@../img/image1.png" />
                </image>
             </ImageView>
             <Text fx:id="player2Name" layoutX="55.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Player 2">
@@ -36,7 +36,7 @@
          <children>
             <ImageView fitHeight="35.0" fitWidth="35.0" layoutX="14.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@res/image2.png" />
+                  <Image url="@../img/image2.png" />
                </image>
             </ImageView>
             <Text fx:id="player1Name" layoutX="61.0" layoutY="29.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Player 1">
@@ -239,13 +239,13 @@
             <AnchorPane layoutX="616.0" layoutY="440.0" prefHeight="87.5" prefWidth="87.5" style="-fx-background-color: EBECD0;" />
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="gameStatusPage" layoutX="803.0" layoutY="22.0" prefHeight="760.0" prefWidth="332.0" style="-fx-background-color: FFFFFF; -fx-background-radius: 24;" stylesheets="@stylesheet.css">
+      <AnchorPane fx:id="gameStatusPage" layoutX="803.0" layoutY="22.0" prefHeight="760.0" prefWidth="332.0" style="-fx-background-color: FFFFFF; -fx-background-radius: 24;" stylesheets="@../../stylesheet.css">
          <children>
             <AnchorPane fx:id="StatusPageOn" prefHeight="92.0" prefWidth="166.0" styleClass="tab-active">
                <children>
                   <ImageView fitHeight="50.0" fitWidth="50.0" layoutX="58.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@res/GameStatus.png" />
+                        <Image url="@../img/GameStatus.png" />
                      </image>
                   </ImageView>
                   <Text layoutX="36.0" layoutY="79.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Game Status">
@@ -259,7 +259,7 @@
                <children>
                   <ImageView fitHeight="50.0" fitWidth="50.0" layoutX="45.0" layoutY="7.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@res/NewGame.png" />
+                        <Image url="@../img/NewGame.png" />
                      </image>
                   </ImageView>
                   <Text layoutX="40.0" layoutY="81.0" strokeType="OUTSIDE" strokeWidth="0.0" text="New Game">
@@ -306,7 +306,7 @@
                   <Font name="Ebrima Bold" size="24.0" />
                </font>
             </Text>
-            <AnchorPane layoutX="17.0" layoutY="356.0" prefHeight="90.0" prefWidth="130.0" style="-fx-background-color: black; -fx-background-radius: 8;" stylesheets="@stylesheet.css">
+            <AnchorPane layoutX="17.0" layoutY="356.0" prefHeight="90.0" prefWidth="130.0" style="-fx-background-color: black; -fx-background-radius: 8;" stylesheets="@../../stylesheet.css">
                <children>
                   <AnchorPane layoutX="9.0" layoutY="5.0" prefHeight="30.0" prefWidth="30.0" style="-fx-background-color: FFFFFF; -fx-background-radius: 20 20 20 20;">
                      <children>
@@ -362,7 +362,7 @@
                   <Font name="Consolas Bold Italic" size="20.0" />
                </font>
             </Text>
-            <AnchorPane fx:id="restart" layoutX="15.0" layoutY="508.0" prefHeight="45.0" prefWidth="130.0" style="-fx-background-color: #3A4558; -fx-background-radius: 8; -fx-cursor: hand;" styleClass="button" stylesheets="@stylesheet.css">
+            <AnchorPane fx:id="restart" layoutX="15.0" layoutY="508.0" prefHeight="45.0" prefWidth="130.0" style="-fx-background-color: #3A4558; -fx-background-radius: 8; -fx-cursor: hand;" styleClass="button" stylesheets="@../../stylesheet.css">
                <children>
                   <Text fill="WHITE" layoutX="43.0" layoutY="27.0" onDragDetected="#resetGame" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="glyph-icon" text="Restart">
                      <font>
@@ -382,7 +382,7 @@
                   <FontAwesomeIcon glyphName="ARROW_LEFT" layoutX="12.0" layoutY="29.0" size="2em" />
                </children>
             </AnchorPane>
-            <AnchorPane fx:id="surrender" layoutX="95.0" layoutY="587.0" prefHeight="45.0" prefWidth="130.0" style="-fx-background-color: black; -fx-background-radius: 8; -fx-cursor: hand;" styleClass="button" stylesheets="@stylesheet.css">
+            <AnchorPane fx:id="surrender" layoutX="95.0" layoutY="587.0" prefHeight="45.0" prefWidth="130.0" style="-fx-background-color: black; -fx-background-radius: 8; -fx-cursor: hand;" styleClass="button" stylesheets="@../../stylesheet.css">
                <children>
                   <Text fill="WHITE" layoutX="40.0" layoutY="31.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="glyph-icon" text="Surrender">
                      <font>
@@ -391,20 +391,20 @@
                   </Text>
                   <ImageView fitHeight="35.0" fitWidth="35.0" layoutY="7.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@res/surrender.png" />
+                        <Image url="@../img/surrender.png" />
                      </image>
                   </ImageView>
                </children>
             </AnchorPane>
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="newGamePage" layoutX="803.0" layoutY="23.0" prefHeight="760.0" prefWidth="332.0" style="-fx-background-color: FFFFFF; -fx-background-radius: 24;" stylesheets="@stylesheet.css" visible="false">
+      <AnchorPane fx:id="newGamePage" layoutX="803.0" layoutY="23.0" prefHeight="760.0" prefWidth="332.0" style="-fx-background-color: FFFFFF; -fx-background-radius: 24;" stylesheets="@../../stylesheet.css" visible="false">
          <children>
             <AnchorPane fx:id="StatusPageOff" prefHeight="92.0" prefWidth="166.0" styleClass="tab-inactive">
                <children>
                   <ImageView fitHeight="50.0" fitWidth="50.0" layoutX="58.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@res/GameStatus.png" />
+                        <Image url="@../img/GameStatus.png" />
                      </image>
                   </ImageView>
                   <Text layoutX="36.0" layoutY="79.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Game Status">
@@ -418,7 +418,7 @@
                <children>
                   <ImageView fitHeight="50.0" fitWidth="50.0" layoutX="45.0" layoutY="7.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@res/NewGame.png" />
+                        <Image url="@../img/NewGame.png" />
                      </image>
                   </ImageView>
                   <Text layoutX="40.0" layoutY="81.0" strokeType="OUTSIDE" strokeWidth="0.0" text="New Game">
@@ -435,7 +435,7 @@
             </Text>
             <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="12.0" layoutY="105.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@res/iconTime.png" />
+                  <Image url="@../img/iconTime.png" />
                </image>
             </ImageView>
             <Text layoutX="56.0" layoutY="307.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Blitz">
@@ -445,7 +445,7 @@
             </Text>
             <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="12.0" layoutY="279.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@res/iconThunder.png" />
+                  <Image url="@../img/iconThunder.png" />
                </image>
             </ImageView>
             <Text layoutX="59.0" layoutY="504.0" strokeType="OUTSIDE" strokeWidth="0.0" text="bullet">
@@ -455,7 +455,7 @@
             </Text>
             <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="12.0" layoutY="478.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@res/iconRocket.png" />
+                  <Image url="@../img/iconRocket.png" />
                </image>
             </ImageView>
             <AnchorPane fx:id="playGame" layoutY="687.0" prefHeight="73.0" prefWidth="332.0" styleClass="play-button">
@@ -470,7 +470,7 @@
             <Rectangle fx:id="opt10Mins" arcHeight="20.0" arcWidth="20.0" height="86.0" layoutX="16.0" layoutY="150.0" strokeType="INSIDE" styleClass="rectangle" width="300.0" />
             <ImageView fitHeight="46.0" fitWidth="46.0" layoutX="76.0" layoutY="168.0" pickOnBounds="true" preserveRatio="true" styleClass="button">
                <image>
-                  <Image url="@res/iconOptionTime.png" />
+                  <Image url="@../img/iconOptionTime.png" />
                </image>
             </ImageView>
             <Text layoutX="143.0" layoutY="197.0" strokeType="OUTSIDE" strokeWidth="0.0" text="10 mins">
@@ -482,12 +482,12 @@
             <Rectangle fx:id="opt3Mins" arcHeight="20.0" arcWidth="20.0" height="86.0" layoutX="16.0" layoutY="518.0" strokeType="INSIDE" styleClass="rectangle" width="300.0" />
             <ImageView fitHeight="46.0" fitWidth="46.0" layoutX="69.0" layoutY="538.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@res/iconOptionTime.png" />
+                  <Image url="@../img/iconOptionTime.png" />
                </image>
             </ImageView>
             <ImageView fitHeight="46.0" fitWidth="46.0" layoutX="68.0" layoutY="350.0" pickOnBounds="true" preserveRatio="true" styleClass="button">
                <image>
-                  <Image url="@res/iconOptionTime.png" />
+                  <Image url="@../img/iconOptionTime.png" />
                </image>
             </ImageView>
             <Text layoutX="143.0" layoutY="381.0" strokeType="OUTSIDE" strokeWidth="0.0" text="5 mins">
@@ -535,7 +535,7 @@
          </children>
       </AnchorPane>
       <AnchorPane fx:id="boardGameChess" layoutX="39.0" layoutY="44.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="704.0" prefWidth="704.0" />
-      <AnchorPane fx:id="notificationWinPage" layoutX="260.0" layoutY="100.0" prefHeight="595.0" prefWidth="250.0" style="-fx-background-color: white; -fx-background-radius: 24;" stylesheets="@stylesheet.css" visible="false">
+      <AnchorPane fx:id="notificationWinPage" layoutX="260.0" layoutY="100.0" prefHeight="595.0" prefWidth="250.0" style="-fx-background-color: white; -fx-background-radius: 24;" stylesheets="@../../stylesheet.css" visible="false">
          <children>
             <AnchorPane prefHeight="150.0" prefWidth="250.0" style="-fx-background-color: #2B2A2A; -fx-background-radius: 24 24 0 0;">
                <children>
@@ -548,7 +548,7 @@
                      <children>
                         <ImageView fitHeight="40.0" fitWidth="40.0" layoutY="8.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@res/delete.png" />
+                              <Image url="@../img/delete.png" />
                            </image>
                         </ImageView>
                      </children>
@@ -574,7 +574,7 @@
                <children>
                   <ImageView fitHeight="47.0" fitWidth="47.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@res/image1.png" />
+                        <Image url="@../img/image1.png" />
                      </image>
                   </ImageView>
                </children>
@@ -586,7 +586,7 @@
                <children>
                   <ImageView fitHeight="47.0" fitWidth="47.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@res/image2.png" />
+                        <Image url="@../img/image2.png" />
                      </image>
                   </ImageView>
                </children>
@@ -608,7 +608,7 @@
             </AnchorPane>
             <ImageView fitHeight="150.0" fitWidth="265.0" layoutY="366.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@res/resultPicture.png" />
+                  <Image url="@../img/resultPicture.png" />
                </image>
             </ImageView>
             <AnchorPane layoutY="547.0" prefHeight="50.0" prefWidth="250.0" style="-fx-background-color: BA5959; -fx-background-radius: 0 0 24 24;" />
@@ -618,7 +618,7 @@
          <children>
             <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@res/Crown.png" />
+                  <Image url="@../img/Crown.png" />
                </image>
             </ImageView>
          </children>
@@ -627,7 +627,7 @@
          <children>
             <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@res/FlagLoose.png" />
+                  <Image url="@../img/FlagLoose.png" />
                </image>
             </ImageView>
          </children>
@@ -636,7 +636,7 @@
          <children>
             <ImageView fitHeight="35.0" fitWidth="35.0" layoutY="-2.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@res/Crown.png" />
+                  <Image url="@../img/Crown.png" />
                </image>
             </ImageView>
          </children>
@@ -645,7 +645,7 @@
          <children>
             <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@res/FlagLoose.png" />
+                  <Image url="@../img/FlagLoose.png" />
                </image>
             </ImageView>
          </children>
