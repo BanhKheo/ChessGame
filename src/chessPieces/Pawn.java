@@ -50,5 +50,12 @@ public class Pawn extends Piece {
         return 1;
     }
 
+    @Override
+    public Pawn copy() {
+        Pawn clone = new Pawn(this.getCol(), this.getRow(), this.isWhite());
+        clone.setMove(this.isMoved());
+        return clone;
+    }
+
 
 }

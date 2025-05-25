@@ -27,7 +27,7 @@ public class Queen extends Piece {
     }
 
     @Override
-    public int[] getBlockPieces(Board board, int newRow, int newCol) {
+    public int[] getBlockPieces(Piece[][] board , int newRow, int newCol) {
         int oldRow = this.getRow();
         int oldCol = this.getCol();
 
@@ -42,6 +42,11 @@ public class Queen extends Piece {
         }
 
         return null; // No blocking piece
+    }
+
+    @Override
+    public Queen copy() {
+        return new Queen(this.getCol(), this.getRow(), this.isWhite());
     }
     @Override
     public int getValue() {

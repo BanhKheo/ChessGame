@@ -23,7 +23,7 @@ public class Bishop extends Piece {
     }
 
     @Override
-    public int[] getBlockPieces(Board board, int newRow, int newCol) {
+    public int[] getBlockPieces(Piece[][] board, int newRow, int newCol) {
         int oldRow = this.getRow();
         int oldCol = this.getCol();
 
@@ -33,7 +33,7 @@ public class Bishop extends Piece {
 
             int r = oldRow + rowStep, c = oldCol + colStep;
             while (r != newRow || c != newCol) {  // Loop until reaching target square
-                if (board.getPieceAt(r, c) != null) {  // Check (r, c) instead of (c, r)
+                if (board[r][c] != null) {  // Check (r, c) instead of (c, r)
                     return new int[]{r, c};  // Blocked position
                 }
                 r += rowStep;
@@ -43,7 +43,10 @@ public class Bishop extends Piece {
         return null;  // No blocking piece
     }
 
-
+    @Override
+    public Bishop copy() {
+        return new Bishop(this.getCol(), this.getRow(), this.isWhite());
+    }
     @Override
     public int getValue() {
         return 3;

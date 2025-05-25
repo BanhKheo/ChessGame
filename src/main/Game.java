@@ -1,6 +1,5 @@
 package main;
 
-import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -26,7 +25,7 @@ public class Game extends Application {
       board = new Board();
 
       // Load main menu FXML
-      FXMLLoader mainLoader = new FXMLLoader(Game.class.getResource("/MainPage.fxml"));
+      FXMLLoader mainLoader = new FXMLLoader(Game.class.getResource("/res/layout/MainPage.fxml"));
       if (mainLoader.getLocation() == null) {
          throw new IOException("Cannot find MainPage.fxml at /MainPage.fxml");
       }
@@ -40,7 +39,7 @@ public class Game extends Application {
       mainController.setGame(this);
 
       // Load chess game FXML
-      FXMLLoader chessLoader = new FXMLLoader(Game.class.getResource("/GameBoard.fxml"));
+      FXMLLoader chessLoader = new FXMLLoader(Game.class.getResource("/res/layout/GameBoard.fxml"));
       if (chessLoader.getLocation() == null) {
          throw new IOException("Cannot find GameBoard.fxml at /GameBoard.fxml");
       }
