@@ -305,7 +305,7 @@ public class Board {
 
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
-                if (!legalMove(piece, col, row) || isBlocked(piece, row, col)) continue;
+                if (!legalMove(piece , col ,row)) continue;
 
                 Piece originalTarget = board[row][col];
                 board[originalRow][originalCol] = null;
@@ -321,7 +321,6 @@ public class Board {
                 if (kingSafe) moves.add(new int[]{col, row});
             }
         }
-
         if (piece instanceof Pawn pawn) pawn.setMove(wasMoved);
         else if (piece instanceof King king) king.setMove(wasMoved);
         else if (piece instanceof Rook rook) rook.setMove(wasMoved);
@@ -530,8 +529,6 @@ public class Board {
         return isOnBoard(row, col) ? board[row][col] : null;
     }
     public Piece getSelectedPiece() { return selectedPiece; }
-    public void setSelectedPiece(Piece piece) { this.selectedPiece = piece; }
-    public List<int[]> getValidMoves() { return validMoves; }
     public boolean isWhiteTurn() { return whiteTurn; }
     public void setWhiteTurn(boolean whiteTurn) { this.whiteTurn = whiteTurn; }
     public boolean isAITurn() { return isAIEnabled && !whiteTurn && ai != null; }

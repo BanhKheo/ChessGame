@@ -1,6 +1,5 @@
 package chessPieces;
 
-import main.Board;
 import utilz.LoadImage;
 
 public class Rook extends Piece {
