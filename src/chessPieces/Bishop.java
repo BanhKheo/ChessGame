@@ -1,10 +1,8 @@
 package chessPieces;
 
-import main.Board;
 import utilz.LoadImage;
 
 public class Bishop extends Piece {
-//    private boolean isMove = false;
 
     public Bishop(int x, int y, boolean isWhite) {
         super(x, y, LoadImage.GetPieceImage(isWhite, "b"), isWhite);

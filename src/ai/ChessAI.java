@@ -12,7 +12,6 @@ import utilz.MoveSnapshot;
 public class ChessAI {
 
     private final boolean isWhiteAI;
-    private final TranspositionTable transpositionTable = new TranspositionTable();
 
     public ChessAI(boolean isWhiteAI) {
         this.isWhiteAI = isWhiteAI;
@@ -27,29 +26,16 @@ public class ChessAI {
     }
 
     private Result minimax(Board board, int depth, int alpha, int beta, boolean maximizingPlayer) {
-        long hash = Zobrist.computeHash(board.getBoard(), maximizingPlayer);
-        TranspositionTable.TTEntry ttEntry = transpositionTable.get(hash);
-
-        if (ttEntry != null && ttEntry.depth >= depth) {
-            switch (ttEntry.flag) {
-                case 0: return new Result(ttEntry.score, ttEntry.bestMove);
-                case -1: if (ttEntry.score >= beta) return new Result(ttEntry.score, ttEntry.bestMove); break;
-                case 1: if (ttEntry.score <= alpha) return new Result(ttEntry.score, ttEntry.bestMove); break;
-            }
-        }
-
         if (depth == 0 || board.isGameEnded()) {
             return new Result(evaluateBoard(board), null);
         }
 
         List<Move> moves = board.getAllLegalMoves(maximizingPlayer);
-        // Filter out any out-of-bounds moves (shouldn't be needed if move gen is correct)
         moves.removeIf(m -> m.toRow < 0 || m.toRow >= 8 || m.toCol < 0 || m.toCol >= 8);
         moves.sort(Comparator.comparingInt(m -> -scoreMove(m, board)));
 
         Move bestMove = null;
         int bestScore = maximizingPlayer ? Integer.MIN_VALUE : Integer.MAX_VALUE;
-        int alphaOrig = alpha;
 
         for (Move move : moves) {
             MoveSnapshot snapshot = board.simulateMove(move.piece, move.toRow, move.toCol);
@@ -69,19 +55,13 @@ public class ChessAI {
                 }
                 beta = Math.min(beta, bestScore);
             }
+
             if (beta <= alpha) break;
         }
 
-        // Store TT entry
-        int flag = 0;
-        if (bestScore >= beta) flag = -1; // LOWERBOUND
-        else if (bestScore <= alphaOrig) flag = 1; // UPPERBOUND
-
-        transpositionTable.put(hash, new TranspositionTable.TTEntry(depth, bestScore, flag, bestMove));
         return new Result(bestScore, bestMove);
     }
 
-    // Improved move ordering: prioritize captures, checks, promotions, center control
     private static int scoreMove(Move move, Board board) {
         int row = move.toRow, col = move.toCol;
         if (row < 0 || row >= 8 || col < 0 || col >= 8) return Integer.MIN_VALUE;
@@ -93,7 +73,6 @@ public class ChessAI {
         if ((row == 3 || row == 4) && (col == 3 || col == 4)) score += 20;
         if (move.piece instanceof Pawn && (row == 0 || row == 7)) score += 800;
 
-        // If you trust simulateMove will never go out of bounds now, you can remove try-catch
         MoveSnapshot snapshot = board.simulateMove(move.piece, row, col);
         if (board.isKingInCheck(!move.piece.isWhite())) score += 200;
         board.undoMove(snapshot);

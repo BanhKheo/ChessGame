@@ -3,8 +3,6 @@ package chessPieces;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
-import main.Board;
 import main.Game;
 
 import java.awt.image.BufferedImage;

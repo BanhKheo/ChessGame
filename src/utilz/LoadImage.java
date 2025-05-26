@@ -11,34 +11,6 @@ import java.io.InputStream;
 
 public class LoadImage {
 
-    public static String boardBackground = "200.png";
-    public static String r = ".png";
-    public static String n = ".png";
-    public static String b = ".png";
-    public static String q = "q.png";
-    public static String k = "k.png";
-    public static String p = "p.png";
-
-
-
-    public static BufferedImage GetAtlas(String fileName) {
-        BufferedImage img = null;
-        InputStream is = LoadImage.class.getResourceAsStream("/res/" + fileName);
-        try {
-            img = ImageIO.read(is);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                is.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return img;
-    }
-
     public static Image GetPieceImage(boolean isWhite , String p) {
         BufferedImage img = null;
         InputStream is = LoadImage.class.getResourceAsStream("/res/img/" + getFileName( isWhite , p)+".png");
